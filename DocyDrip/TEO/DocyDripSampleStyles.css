@@ -1,0 +1,143 @@
+﻿.event-edit-basicsegment {
+}
+
+.teo-mastercontainer {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 5px;
+    
+}
+
+    .teo-mastercontainer.active {
+        width: 100%;
+        max-width: 100%;
+        padding: 2px;
+        background-color: #eee;
+        box-shadow: 0px 0px 5px 0px #8ca;
+    }
+
+
+.teo-editorbody {
+    max-width: 100%;
+    width: 100%;
+    
+}
+
+.teo-editorbody.active {
+    max-width: 100%;
+    width: 99%;
+    border-radius: 5px;
+    padding: 2px;
+    background-color: #fff;
+    box-shadow: 0px 0px 5px 0px #7df;
+}
+
+.teo-button-container {
+    transition: all 0.2s ease-in-out;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+    /* .rte-button-container.expanded { */
+        /* height: 100%; */
+        /* width: 100%; */
+    /* } */
+
+.teo-btn {
+	display: inline-block;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+rte-btn:hover {
+	background-color: #ddd;
+    color: #555;
+    border-color: #bbb;
+}
+
+rte-btn:active {
+	background-color: #bbb;
+    color: #333;
+    border-color: #999;
+}
+
+p {
+    word-wrap: break-word;
+    overflow-wrap:anywhere;   
+}
+
+
+span {
+    /*white-space: pre;*/
+}
+
+li {
+    width: fit-content;
+}
+
+.indent {
+    text-indent: 25px;
+}
+
+.justify-left {
+    text-align: left;
+}
+
+.justify-center {
+    text-align: center;
+}
+
+.justify-right {
+    text-align: right;
+}
+
+.justify-full {
+    text-align: justify;
+}
+
+/*Targeting Animations and backgrounds*/
+.text-bg {
+    background-color: #eee;
+    color: black;
+    border-radius: 5px;
+    min-width: 25px;
+}
+
+
+.text-highlight-1 {
+    animation: c-highlight-1 linear 3s;
+}
+
+@keyframes c-highlight-1 {
+    from {
+        outline: 1px solid #0a4;
+    }
+
+    to {
+        outline: 2px solid #fd3;
+    }
+}
+
+.text-highlight-2 {
+    animation: c-highlight-2 linear 2.5s;
+}
+
+@keyframes c-highlight-2 {
+    from {
+        outline: 1px solid #953;
+    }
+
+    to {
+        outline: 1px solid #fff;
+    }
+}

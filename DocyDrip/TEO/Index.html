@@ -3,28 +3,57 @@
 <html>
 <head>
 	<link href="DocyDripSampleStyles.css" rel="stylesheet" />
+	<link href="DemoStyles.css" rel="stylesheet" />
 </head>
-<main>
-	<body>
-		
-		<button class="DocyDrip-TEO-Selector-Event">📝</button>
+	<main>
+		<body>
+			<div class="box-col">
+				<div class="box-row box-center1">
+					<span class="text-center justify-center" style="height: 100px; width:100px;">click the paper and pen</span>
+					<button class="DocyDrip-TEO-Selector-Event">📝</button>
+					<span class="text-center justify-center" style="height: 100px; width:100px;">Update Values to load different editors</span>
+				</div>
+				<br>
+				<div class="box-row box-center1">
 			
-		<div class="DocyDrip-TEO-Editable-Container" data-test="1023" id='001'>
-		</div>
-		<br>
-		<div class="DocyDrip-TEO-Editable-Container" data-test="362" id='001'>
-		</div>
-		<br>
-		<div class="DocyDrip-TEO-Editable-Container" data-test="724" id='001'>
-		</div>
-		<br>
-		<div class="w100" id="EditorFooter">
-			<span>Edited by: Tyler Reber</span>
-		</div>
+					<div class="box-col">
+						<input type="text" id="input1" value="1023"/>
+						<input type="submit" value="Submit1" onclick="update_one(this)">
+					</div>
+					<div class="box-col">
+						<input type="text" id="input2" value="362"/>
+						<input type="submit" value="Submit2" onclick="update_two(this)">
+					</div>
+					<div class="box-col">
+						<input type="text" id="input3" value="724">
+						<input type="submit" value="Submit3" onclick="update_three(this)">
+					</div>
+				
+				</div>
 
-</div>
+			</div>
+			<br>
+			<br>
+			<div class="box-col">
+				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="1023" id='001'>
+				</div>	
+				<br>
+				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="362" id='002'>
+				</div>
+				<br>
+				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="724" id='003'>
+				</div>
 
-	</body>	
-	<script src="DocyDrip-TEO.js"></script>	
-<main>
+			</div>
+			
+
+
+		</body>	
+		<script src="DocyDrip-TEO.js"></script>
+		<script src="DemoScript.js"></script>	
+	<main>
 </html>
+
+			<!-- <div class="w100" id="EditorFooter"> -->
+			<!-- <span>Edited by: Tyler Reber</span> -->
+			<!-- </div> -->

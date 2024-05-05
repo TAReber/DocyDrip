@@ -1,12 +1,7 @@
 ﻿.event-edit-basicsegment {
 }
 
-.Demo-Example-Container {
-	
-}
-
 .DocyDrip-TEO-Selector-Event {
-	position: static;
 	width:fit-content;
 	height:fit-content;	
 	transform: 50px;
@@ -14,11 +9,19 @@
 	margin:0px;
 	font-size: 5rem;
 	border-radius: 8px;
+	
+}
+
+.DocyDrip-TEO-Selector-Event:hover {
+	background-color: azure;
+	opacity: 0.1;
 }
 
 .DocyDrip-TEO-Selector-Event.Active {
 	border: 2px solid red;
 }
+
+
 
 .DocyDrip.TEO.ButtonContainer {
 	position:sticky;
@@ -50,36 +53,7 @@
     box-shadow: 0px 0px 5px 0px #7df;
 }
 
-.teo-mastercontainer {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 5px;
-    
-}
 
-    .teo-mastercontainer.active {
-        width: 100%;
-        max-width: 100%;
-        padding: 2px;
-        background-color: #eee;
-        box-shadow: 0px 0px 5px 0px #8ca;
-    }
-
-
-.teo-editorbody {
-    max-width: 100%;
-    width: 100%;
-    
-}
-
-.teo-editorbody.active {
-    max-width: 100%;
-    width: 99%;
-    border-radius: 5px;
-    padding: 2px;
-    background-color: #fff;
-    box-shadow: 0px 0px 5px 0px #7df;
-}
 
 .teo-button-container {
     transition: all 0.2s ease-in-out;
@@ -126,9 +100,6 @@ p {
 }
 
 
-span {
-    /*white-space: pre;*/
-}
 
 li {
     width: fit-content;

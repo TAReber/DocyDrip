@@ -18,7 +18,6 @@ const OpenEditors = new Map();
 
 document.addEventListener('DOMContentLoaded', () => {
 	Event_DripDocs_TEO_Selector();
-    //Event_AddEditBasicSegments();
 });
 
 function Event_DripDocs_TEO_Selector() {
@@ -75,7 +74,7 @@ function Remove_OpenEditor_Toggles(){
 
 function DocyDrip_OpenEditor_Event(editableContainer){
     if (editableContainer.classList.contains(Active) === false) {		
-        const editor = new RichTextEditorObject(editableContainer, editableContainer.getAttribute('data-test'));
+        const editor = new RichTextEditorObject(editableContainer, editableContainer.getAttribute('data-TEO-BitCode'));
     }
     else {
 		let targetid = editableContainer.id;
@@ -122,17 +121,17 @@ const BlockClasses = [ClassJustifyLeft, ClassJustifyCenter, ClassJustifyRight, C
 
 //BitWise Constants //No Extras = 0
 const Bit_BasicTags = 1; // (1) Bold, Italic, Underline
-const Bit_AdvancedTags = (1 << 2); // (2) Strikethrough, Subscript, SuperScirpt
+const Bit_AdvancedTags = (1 << 1); // (2) Strikethrough, Subscript, SuperScirpt
 
-const Bit_FontColorsOptions = (1 << 3); // (4)
-const Bit_FontBackgroundColorOptions = (1 << 4); // (8)
-const Bit_FontSizeOptions = (1 << 5); // (16)
-const Bit_FontFamilyOptions = (1 << 6);  // (32)
+const Bit_FontColorsOptions = (1 << 2); // (4)
+const Bit_FontBackgroundColorOptions = (1 << 3); // (8)
+const Bit_FontSizeOptions = (1 << 4); // (16)
+const Bit_FontFamilyOptions = (1 << 5);  // (32)
 
-const Bit_StandardHeaders = (1 << 7); //  (64)  H1 - H6
-const Bit_StandardBlockFormats = (1 << 8); // (128)   Standard Block Alignment and justify
-const Bit_ListBlocks = (1 << 9); //  (256)   Ordered and Unordered Lists
-const Bit_ListBlockFormats = (1 << 10); // (512) Not Used
+const Bit_StandardHeaders = (1 << 6); //  (64)  H1 - H6
+const Bit_StandardBlockFormats = (1 << 7); // (128)   Standard Block Alignment and justify
+const Bit_ListBlocks = (1 << 8); //  (256)   Ordered and Unordered Lists
+const Bit_ListBlockFormats = (1 << 9); // (512) Not Used
 
 
 
@@ -285,7 +284,7 @@ class RichTextEditorObject {
 			this.FontFamilySelector = this.CreateFontFamilySelector(this.ButtonContainer);	
 		}
 		
-		//this.standardBlockOptions = this.CreateStandardBlockOptions(this.ButtonContainer);
+		
 		this.boundHandleStandardBlockOptionsChange = null;
 		this.StandardBlockSelector = null;
 		if(this.Options & Bit_StandardHeaders) {
@@ -391,32 +390,6 @@ class RichTextEditorObject {
 			//No Formats Exist, or might ever exist.
 		}
 
-
-
-        //this.styles.bold.removeEventListener('click', this.boundHandleBoldClick);
-        //this.styles.italic.removeEventListener('click', this.boundHandleItalicClick);
-        //this.styles.underline.removeEventListener('click', this.boundHandleUnderlineClick);
-        // this.styles.strikethrough.removeEventListener('click', this.boundHandleStrikeThroughClick);
-        // this.styles.subscript.removeEventListener('click', this.boundHandleSubscriptClick);
-        // this.styles.superscript.removeEventListener('click', this.boundHandleSuperscriptClick);
-
-		//Selectors
-        //this.standardBlockOptions.removeEventListener('change', this.boundHandleBlockOptionsClick);
-		//this.fontFamilySelector.removeEventListener('change', this.boundHandleTreeFontFamilyClick);
-		
-		
-		//this.fontsizeSelector.removeEventListener('change', this.boundHandleTreeFontSizeClick);
-		
-        //this.blocks.OL.removeEventListener('click', this.boundHandleOrderedListClick);
-        //this.blocks.UL.removeEventListener('click', this.boundHandleUnorderedListClick);
-
-        // this.blockFormats.Indent.removeEventListener('click', this.boundHandleIndentClick);
-        // this.blockFormats.Outdent.removeEventListener('click', this.boundHandleOutdentClick);
-        // this.blockFormats.JustifyLeft.removeEventListener('click', this.boundHandleJustifyLeftClick);
-        // this.blockFormats.JustifyCenter.removeEventListener('click', this.boundHandleJustifyCenterClick);
-        // this.blockFormats.JustifyRight.removeEventListener('click', this.boundHandleJustifyRightClick);
-        // this.blockFormats.JustifyFull.removeEventListener('click', this.boundHandleJustifyFullClick);
-		
 		this.ButtonContainer.remove();
 		
 		// this.buttonContainer
@@ -547,7 +520,7 @@ class RichTextEditorObject {
     }
     HandleStandardBlockOptionsChange(event) {
         if (event.isTrusted) {			
-            this.ChangeBlockType(this.standardBlockOptions.value);
+            this.ChangeBlockType(this.StandardBlockSelector.value);
         }
     }
 
@@ -652,17 +625,17 @@ class RichTextEditorObject {
         selector.appendChild(this.AddNewOption(ConstH5, 'Header 5'));
         selector.appendChild(this.AddNewOption(ConstH6, 'Header 6'));
 
-        selector.addEventListener('change', this.boundHandleBlockOptionsClick);
+        selector.addEventListener('change', this.boundHandleStandardBlockOptionsChange);
         return selector
     }
 	CreateStandardBlockFormatButtons(containerid) {
         let formats = {
-            Indent: this.NewClickButton(containerid, this.boundHandleIndentClick, '&#8640', 'Indent'),
-            Outdent: this.NewClickButton(containerid, this.boundHandleOutdentClick, '&#8636', 'Outdent'),
-            JustifyLeft: this.NewClickButton(containerid, this.boundHandleJustifyLeftClick, '&#8676', 'Justify Left'),
-            JustifyCenter: this.NewClickButton(containerid, this.boundHandleJustifyCenterClick, '&#8633', 'Justify Center'),
-            JustifyRight: this.NewClickButton(containerid, this.boundHandleJustifyRightClick, '&#8677', 'Justify Right'),
-            JustifyFull: this.NewClickButton(containerid, this.boundHandleJustifyFullClick, '&#8700', 'Justify Full'),
+            Indent: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleIndentClick, '&#8640', 'Indent'),
+            Outdent: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleOutdentClick, '&#8636', 'Outdent'),
+            JustifyLeft: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyLeftClick, '&#8676', 'Justify Left'),
+            JustifyCenter: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyCenterClick, '&#8633', 'Justify Center'),
+            JustifyRight: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyRightClick, '&#8677', 'Justify Right'),
+            JustifyFull: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyFullClick, '&#8700', 'Justify Full'),
         }
 
         return formats;

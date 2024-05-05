@@ -1,0 +1,38 @@
+.text-center {
+    text-align: center;
+}
+
+
+.w100 {
+    width: 100%;
+}
+
+.box-row {
+    display: flex;
+    flex-direction: row; /* Is Row by Default */
+    
+    /*align-items:center;  align-items Effects direction Axis, justify-content effects adjacent Axis */
+}
+
+.box-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.box-center0 {
+    justify-content: center;
+    align-items: center;
+}
+
+.box-center1 {
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.me-justify{
+    justify-self:center;
+}
+
+.box-justify0 {
+    justify-content: center;
+}

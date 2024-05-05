@@ -15,35 +15,78 @@
 //When the text editors are openened, onlt then is the text editor created and stored.
 const OpenEditors = new Map();
 
+
 document.addEventListener('DOMContentLoaded', () => {
-    Event_AddEditBasicSegments();
+	Event_DripDocs_TEO_Selector();
+    //Event_AddEditBasicSegments();
 });
 
-function Event_AddEditBasicSegments() {
-    let toggles = document.querySelectorAll('.event-docydrip-teo');
+function Event_DripDocs_TEO_Selector() {
+	let toggle = document.querySelector('.DocyDrip-TEO-Selector-Event');	
+	toggle.addEventListener('click', (e) => {
+		if(toggle.classList.contains('Active')){
+			toggle.classList.remove('Active');
+			Remove_OpenEditor_Toggles();
+		}
+		else{
+			toggle.classList.add('Active');
+			Add_OpenEditor_Toggles();
+		}		
+	});
+}
 
-    for (let i = 0; i < toggles.length; i++) {
+function Add_OpenEditor_Toggles(){
+	let toggles = document.querySelectorAll('.DocyDrip-TEO-Editable-Container');
+	Array.from(toggles).forEach((editablElement) => {
+		let buttonContainer = document.createElement('div');
+		buttonContainer.classList.add('.DocyDrip.TEO.ButtonContainer');
+		editablElement.insertAdjacentElement('beforebegin', buttonContainer);
+				
+		let details = document.createElement('details');
+		buttonContainer.appendChild(details);
+		let summary = document.createElement('summary');
+		summary.classList.add('DocyDrip-TEO-ObjectCreator');
+		details.appendChild(summary);
+		summary.addEventListener('click', function() {
+			DocyDrip_OpenEditor_Event(editablElement);
+		});
+			
+	});
+}
 
-        toggles[i].addEventListener('click', (e) => {
+function Remove_OpenEditor_Toggles(){
+	if(OpenEditors.size > 0){
+		let result = window.confirm(`Editor Current Open: ${OpenEditors.count}, Press OK to Save, Cancel to Discard`);
+		OpenEditors.forEach((texteditorobject, key) => {
+			if(result = false){
+				texteditorobject.RestoreOriginalContent();
+			}
+			texteditorobject.destroy();
+			//TODO:: Call Your API to Update Database.
+		});	
+	}
 
-            let targetid = e.target.dataset.target;
-            let container = document.getElementById(targetid);
+	let toggles = document.querySelectorAll('.DocyDrip-TEO-Editable-Container');
+	Array.from(toggles).forEach((editableElement) => {
+		if(editableElement.previousSibling.classList.contains('.DocyDrip.TEO.ButtonContainer'))
+			editableElement.previousSibling.remove();
+	});
+}
 
-            if (container.classList.contains(Active) === false) {
-                const editor = new RichTextEditorObject(container);
-            }
-            else {
-                const editor = OpenEditors.get(targetid);
-                editor.destroy();
-
-            }
-        });
+function DocyDrip_OpenEditor_Event(editableContainer){
+    if (editableContainer.classList.contains(Active) === false) {		
+        const editor = new RichTextEditorObject(editableContainer, editableContainer.getAttribute('data-test'));
     }
+    else {
+		let targetid = editableContainer.id;
+        const editor = OpenEditors.get(targetid);
+        editor.destroy();
+		//TODO:: Call Your API to Update Database.
+	}	
 }
 
 //Initialization class name 
-const Active = 'active';
-
+const Active = 'Active';
 
 const ConstTree = 'SPAN';
 //Standard Block Tags
@@ -62,7 +105,6 @@ const ConstUList = 'UL';
 const ConstOList = 'OL';
 const ConstListItem = 'LI';
 
-
 //CSS CLASS Globals
 const ConstEditorBody = '#docydrip-teo-body';
 const ConstButtonContainerStyles = 'teo-button-container'
@@ -78,11 +120,27 @@ const ClassJustifyRight = 'justify-right';
 const ClassJustifyFull = 'justify-full';
 const BlockClasses = [ClassJustifyLeft, ClassJustifyCenter, ClassJustifyRight, ClassJustifyFull];
 
+//BitWise Constants //No Extras = 0
+const Bit_BasicTags = 1; // (1) Bold, Italic, Underline
+const Bit_AdvancedTags = (1 << 2); // (2) Strikethrough, Subscript, SuperScirpt
+
+const Bit_FontColorsOptions = (1 << 3); // (4)
+const Bit_FontBackgroundColorOptions = (1 << 4); // (8)
+const Bit_FontSizeOptions = (1 << 5); // (16)
+const Bit_FontFamilyOptions = (1 << 6);  // (32)
+
+const Bit_StandardHeaders = (1 << 7); //  (64)  H1 - H6
+const Bit_StandardBlockFormats = (1 << 8); // (128)   Standard Block Alignment and justify
+const Bit_ListBlocks = (1 << 9); //  (256)   Ordered and Unordered Lists
+const Bit_ListBlockFormats = (1 << 10); // (512) Not Used
+
+
 
 //Void Element
 const ConstBR = 'BR';
 
-const fontlist = [
+const ConstDefaultFontFamily = "Arial"; //Initialized Seperatly with ""
+const ConstFontFamilies = [
     "Arial", "Verdana", "Times New Roman", "Georgia", "Trebuchet MS",
     "Tahoma", "Courier New", "Lucida Console", "Impact", "Comic Sans MS",
     "Palatino Linotype", "Book Antiqua", "Lucida Sans Unicode", "Garamond", "MS Serif",
@@ -91,35 +149,79 @@ const fontlist = [
     "Papyrus", "Brush Script MT", "Snell Roundhand", "Zapf Chancery", "Zapfino"
 ];
 
+const ConstDefaultFontColor = "Black"; //Trees with out a style will default to ""
+const ConstDefaultBackgroundColor = "White"
+const ConstColorOptions = [
+  ["rgb(0, 0, 0)", "Black"],
+  ["rgb(255, 255, 255)", "White"],
+  ["rgb(255, 0, 0)", "Red"],
+  ["rgb(0, 255, 0)", "Green"],
+  ["rgb(0, 0, 255)", "Blue"],
+  ["rgb(255, 255, 0)", "Yellow"],
+  ["rgb(255, 0, 255)", "Magenta"],
+  ["rgb(0, 255, 255)", "Cyan"],
+  ["rgb(255, 165, 0)", "Orange"],
+  ["rgb(128, 0, 128)", "Purple"],
+  ["rgb(0, 128, 0)", "Dark Green"],
+  ["rgb(0, 0, 128)",  "Navy"]
+];
+
+const ConstDefaultFontSize = '12px'; //Option Initialized Seperatly
+const ConstFontSizes = [
+	"12px",
+	"14px",
+	"18px",
+	"22px",
+	"26px",
+	"30px",
+]
+
 const Behavior = {
     Add: 1,
     Remove: 2,
     Toggle: 3
 }
 
+const StyleType = {
+	Color: 1,
+	FontFamily: 2,
+	BackgroundColor: 3,
+	FontSize: 4
+}
+
+const ExtraOptionStart = {
+	Value: "TEO-Sync-Start",
+	Desc: "Normalize Start"
+}
+
+const ExtraOptionEnd = {
+	Value:"TEO-Sync-End",
+	Desc: "Normalize End"
+}
+
 class RichTextEditorObject {
 
-    constructor(container) {
-        this.Editor = container;
-        this.id = container.id;
-
-        OpenEditors.set(this.id, this);
-
-        //this.Header = container.querySelector('#EditorHeader');
-        //this.Header.contentEditable = true;
-        this.Page = container.querySelector(ConstEditorBody);
+    constructor(editableContainer, data) {
+		this.Page = editableContainer; //container.querySelector(ConstEditorBody);
         this.Page.contentEditable = true;
-        //this.Footer = container.querySelector('#EditorFooter');
-
-        //Targeting Variables Surrounding Selections and clicking
+		this.id = this.Page.id;
+		OpenEditors.set(this.id, this);
+		this.ButtonContainer = this.CreateButtonContainer();
+		
+		        //Targeting Variables Surrounding Selections and clicking
         this.StartBlock = null;
         this.EndBlock = null;
         this.RangeTree_Start = null;
         this.RangeTree_End = null;
         this.XTargetStart = null;
         this.XTargetEnd = null;
-
-        //Event Handler References
+				
+		if(data === null){
+			data = 0;		
+		}		
+		this.Options = data;
+		
+		//Essential Editor Behaviors
         this.boundHandlePageSelectionChange = this.HandlePageSelectionChange.bind(this);
 
         this.boundHandlePageKeyDown = this.HandlePageKeyDown.bind(this);
@@ -130,46 +232,106 @@ class RichTextEditorObject {
         this.boundHandlePageDragStart = this.HandlePageDragStart.bind(this);
         this.boundHandlePageDragDrop = this.HandlePageDragDrop.bind(this);
         this.boundHandlePagePaste = this.HandlePagePasteText.bind(this);
+		this.Initialize();
 
-        //Text Style Event Handlers
-        this.boundHandleBoldClick = this.HandleStyleButtonClick.bind(this, 'B');
-        this.boundHandleItalicClick = this.HandleStyleButtonClick.bind(this, 'I');
-        this.boundHandleUnderlineClick = this.HandleStyleButtonClick.bind(this, 'U');
-        this.boundHandleStrikeClick = this.HandleStyleButtonClick.bind(this, 'STRIKE');
-        this.boundHandleSuperscriptClick = this.HandleStyleButtonClick.bind(this, 'SUP');
-        this.boundHandleSubscriptClick = this.HandleStyleButtonClick.bind(this, 'SUB');
 
-        this.boundHandleOrderedListClick = this.HandleBlockStyleClick.bind(this, 'OL');
-        this.boundHandleUnorderedListClick = this.HandleBlockStyleClick.bind(this, 'UL');
+		this.BasicTags_Bindings;
+		this.BasicTags_Buttons = null;
+		if(this.Options & Bit_BasicTags){
+			this.BasicTags_Bindings = {
+				boundHandleBoldClick: this.HandleStyleButtonClick.bind(this, 'B'),
+				boundHandleItalicClick: this.HandleStyleButtonClick.bind(this, 'I'),
+				boundHandleUnderlineClick: this.HandleStyleButtonClick.bind(this, 'U')
+			}
+			this.BasicTags_Buttons = this.CreateBasicTag_Buttons(this.ButtonContainer);
+		}
 
-        this.boundHandleBlockOptionsClick = this.HandleStandardBlockSelectorClick.bind(this);
+		this.AdvancedTags_Bindings;
+		this.AdvancedTags_Buttons = null;
+		if(this.Options & Bit_AdvancedTags){
+			this.AdvancedTags_Bindings = {
+				boundHandleStrikeClick: this.HandleStyleButtonClick.bind(this, 'STRIKE'),
+				boundHandleSuperscriptClick: this.HandleStyleButtonClick.bind(this, 'SUP'),
+				boundHandleSubscriptClick: this.HandleStyleButtonClick.bind(this, 'SUB')
+			}
+			this.AdvancedTags_Buttons = this.CreateAdvancedTag_Buttons(this.ButtonContainer);
+		}
+		
+		this.boundHandleTextColorOptionChange = null;
+		this.ColorSelector = null;
+		if(this.Options & Bit_FontColorsOptions){
+			this.boundHandleTextColorOptionChange = this.HandleTextColorOptionChange.bind(this);
+			this.ColorSelector = this.CreateFontColorSelector(this.ButtonContainer);
+		}
+		
+		this.boundHandleBackgroundColorOptionsChange = null;
+		this.BackgroundColorSelector = null;
+		if(this.Options & Bit_FontBackgroundColorOptions) {
+			this.boundHandleBackgroundColorOptionsChange = this.HandleBackgroundColorOptionsChange.bind(this);
+			this.BackgroundColorSelector = this.CreateBackgroundColorSelector(this.ButtonContainer);
+		}
+		
+		this.boundHandleFontSizeOptionsChange = null;
+		this.FontSizeSelector = null;
+		if(this.Options & Bit_FontSizeOptions) {
+			this.boundHandleFontSizeOptionsChange = this.HandleFontSizeOptionsChange.bind(this);
+			this.FontSizeSelector = this.CreateFontSizeSelector(this.ButtonContainer);
+		}
+		
+		this.boundHandleFontFamilyOptionsChange = null;
+		this.FontFamilySelector = null;	
+		if(this.Options & Bit_FontFamilyOptions){
+			this.boundHandleFontFamilyOptionsChange = this.HandleFontFamilyOptionsChange.bind(this);
+			this.FontFamilySelector = this.CreateFontFamilySelector(this.ButtonContainer);	
+		}
+		
+		//this.standardBlockOptions = this.CreateStandardBlockOptions(this.ButtonContainer);
+		this.boundHandleStandardBlockOptionsChange = null;
+		this.StandardBlockSelector = null;
+		if(this.Options & Bit_StandardHeaders) {
+			this.boundHandleStandardBlockOptionsChange = this.HandleStandardBlockOptionsChange.bind(this);
+			this.StandardBlockSelector = this.CreateStandardBlockOptions(this.ButtonContainer);
+		}
+		
+		this.StandardBlockFormats_Bindings = null;
+		this.StandardBlockFormat_Buttons = null;
+		if(this.Options & Bit_StandardBlockFormats){
+			this.StandardBlockFormats_Bindings = {
+				boundHandleIndentClick: this.HandleBlockFormatClick.bind(this, ClassIndent),
+				boundHandleOutdentClick: this.HandleBlockFormatClick.bind(this, ClassOutdent),
+				boundHandleJustifyLeftClick: this.HandleBlockFormatClick.bind(this, ClassJustifyLeft),
+				boundHandleJustifyCenterClick: this.HandleBlockFormatClick.bind(this, ClassJustifyCenter),
+				boundHandleJustifyRightClick: this.HandleBlockFormatClick.bind(this, ClassJustifyRight),
+				boundHandleJustifyFullClick: this.HandleBlockFormatClick.bind(this, ClassJustifyFull)
+			}
+			this.StandardBlockFormat_Buttons = this.CreateStandardBlockFormatButtons(this.ButtonContainer);
+		}
+		
+		this.ListBlock_Bindings = null;
+		this.ListBlock_Buttons = null;
+		if(this.Options & Bit_ListBlocks){
+			this.ListBlock_Bindings = {
+				boundHandleOrderedListClick: this.HandleBlockStyleClick.bind(this, 'OL'),
+				boundHandleUnorderedListClick: this.HandleBlockStyleClick.bind(this, 'UL')
+			}
+			this.ListBlock_Buttons = this.CreateListBlockButtons(this.ButtonContainer);
+		}
+		//Not Implemented
+		if(this.Options & Bit_ListBlockFormats){
+			//console.log('non existent list Options include');
+		}
+	
 
-        this.boundHandleIndentClick = this.HandleBlockFormatClick.bind(this, ClassIndent);
-        this.boundHandleOutdentClick = this.HandleBlockFormatClick.bind(this, ClassOutdent);
-        this.boundHandleJustifyLeftClick = this.HandleBlockFormatClick.bind(this, ClassJustifyLeft);
-        this.boundHandleJustifyCenterClick = this.HandleBlockFormatClick.bind(this, ClassJustifyCenter);
-        this.boundHandleJustifyRightClick = this.HandleBlockFormatClick.bind(this, ClassJustifyRight);
-        this.boundHandleJustifyFullClick = this.HandleBlockFormatClick.bind(this, ClassJustifyFull);
-
-        this.Initialize();
-        //let ButtonContainer = container.querySelector('#EditorButtons');
-		let ButtonContainer = this.CreateButtonContainer();
-
-        this.styles = this.CreateStyleButtons(ButtonContainer);
-        this.blocks = this.CreateBlockButtons(ButtonContainer);
-        this.standardBlockOptions = this.CreateStandardBlockOptions(ButtonContainer);
-        this.blockFormats = this.CreateBlockFormatButtons(ButtonContainer);
-
+		let range = document.createRange();
+		range.selectNodeContents(this.Page);
+		this.OriginalHTMLContent = range.cloneContents();
 
     }
+	
     destroy() {
         //console.log('Destroying Object');
-        this.Editor.classList.remove(Active);
         this.Page.classList.remove(Active);
-
-        //this.Header.contentEditable = false;
         this.Page.contentEditable = false;
-
         document.removeEventListener('selectionchange', this.boundHandlePageSelectionChange);
 
         this.Page.removeEventListener('keydown', this.boundHandlePageKeyDown);
@@ -180,50 +342,142 @@ class RichTextEditorObject {
         this.Page.removeEventListener('dragstart', this.boundHandlePageDragStart);
         this.Page.removeEventListener('drop', this.boundHandlePageDragDrop);
         this.Page.removeEventListener('paste', this.boundHandlePagePaste);
+				
+		if(this.Options & Bit_BasicTags){
+			this.BasicTags_Buttons.bold.removeEventListener('click', this.BasicTags_Bindings.boundHandleBoldClick);
+			this.BasicTags_Buttons.italic.removeEventListener('click', this.BasicTags_Bindings.boundHandleItalicClick);
+			this.BasicTags_Buttons.underline.removeEventListener('click', this.BasicTags_Bindings.boundHandleUnderlineClick);
+		}		
+		if(this.Options & Bit_AdvancedTags){
+			this.AdvancedTags_Buttons.strikethrough.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleStrikeThroughClick);
+			this.AdvancedTags_Buttons.subscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSubscriptClick);
+			this.AdvancedTags_Buttons.superscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSuperscriptClick);
+		}		
+		if(this.Options & Bit_FontColorsOptions){
+			this.ColorSelector.removeEventListener('change', this.boundHandleTextColorOptionChange);
+		}
+		
+		if(this.Options & Bit_FontBackgroundColorOptions) {
+			this.BackgroundColorSelector.removeEventListener('change', this.boundHandleBackgroundColorOptionsChange);
+		}
+		
+		if(this.Options & Bit_FontSizeOptions) {
+			this.FontSizeSelector.removeEventListener('change', this.boundHandleFontSizeOptionsChange);
+		}
+		
+		if(this.Options & Bit_FontFamilyOptions){
+			this.FontFamilySelector.removeEventListener('change', this.boundHandleFontFamilyOptionsChange);
+		}
+				
+		if(this.Options & Bit_StandardHeaders) {
+			this.StandardBlockSelector.removeEventListener('change', this.boundHandleStandardBlockOptionsChange);
+		}
+		
+		if(this.Options & Bit_StandardBlockFormats){
+			this.StandardBlockFormat_Buttons.Indent.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleIndentClick);
+			this.StandardBlockFormat_Buttons.Outdent.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleOutdentClick);
+			this.StandardBlockFormat_Buttons.JustifyLeft.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleJustifyLeftClick);
+			this.StandardBlockFormat_Buttons.JustifyCenter.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleJustifyCenterClick);
+			this.StandardBlockFormat_Buttons.JustifyRight.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleJustifyRightClick);
+			this.StandardBlockFormat_Buttons.JustifyFull.removeEventListener('click', this.StandardBlockFormats_Bindings.boundHandleJustifyFullClick);
+		}
+		
+		if(this.Options & Bit_ListBlocks){
+			this.ListBlock_Buttons.OL.removeEventListener('click', this.ListBlock_Bindings.boundHandleOrderedListClick),
+			this.ListBlock_Buttons.UL.removeEventListener('click', this.ListBlock_Bindings.boundHandleUnorderedListClick)
+		}
+		
+		if(this.Options & Bit_ListBlockFormats){
+			//No Formats Exist, or might ever exist.
+		}
 
 
-        this.styles.bold.removeEventListener('click', this.boundHandleBoldClick);
-        this.styles.italic.removeEventListener('click', this.boundHandleItalicClick);
-        this.styles.underline.removeEventListener('click', this.boundHandleUnderlineClick);
-        this.styles.strikethrough.removeEventListener('click', this.boundHandleStrikeThroughClick);
-        this.styles.subscript.removeEventListener('click', this.boundHandleSubscriptClick);
-        this.styles.superscript.removeEventListener('click', this.boundHandleSuperscriptClick);
 
-        this.styles.bold.remove();
-        this.styles.italic.remove();
-        this.styles.underline.remove();
-        this.styles.strikethrough.remove();
-        this.styles.subscript.remove();
-        this.styles.superscript.remove();
+        //this.styles.bold.removeEventListener('click', this.boundHandleBoldClick);
+        //this.styles.italic.removeEventListener('click', this.boundHandleItalicClick);
+        //this.styles.underline.removeEventListener('click', this.boundHandleUnderlineClick);
+        // this.styles.strikethrough.removeEventListener('click', this.boundHandleStrikeThroughClick);
+        // this.styles.subscript.removeEventListener('click', this.boundHandleSubscriptClick);
+        // this.styles.superscript.removeEventListener('click', this.boundHandleSuperscriptClick);
 
-        this.standardBlockOptions.removeEventListener('change', this.boundHandleBlockOptionsClick);
+		//Selectors
+        //this.standardBlockOptions.removeEventListener('change', this.boundHandleBlockOptionsClick);
+		//this.fontFamilySelector.removeEventListener('change', this.boundHandleTreeFontFamilyClick);
+		
+		
+		//this.fontsizeSelector.removeEventListener('change', this.boundHandleTreeFontSizeClick);
+		
+        //this.blocks.OL.removeEventListener('click', this.boundHandleOrderedListClick);
+        //this.blocks.UL.removeEventListener('click', this.boundHandleUnorderedListClick);
 
-        this.blocks.OL.removeEventListener('click', this.boundHandleOrderedListClick);
-        this.blocks.UL.removeEventListener('click', this.boundHandleUnorderedListClick);
+        // this.blockFormats.Indent.removeEventListener('click', this.boundHandleIndentClick);
+        // this.blockFormats.Outdent.removeEventListener('click', this.boundHandleOutdentClick);
+        // this.blockFormats.JustifyLeft.removeEventListener('click', this.boundHandleJustifyLeftClick);
+        // this.blockFormats.JustifyCenter.removeEventListener('click', this.boundHandleJustifyCenterClick);
+        // this.blockFormats.JustifyRight.removeEventListener('click', this.boundHandleJustifyRightClick);
+        // this.blockFormats.JustifyFull.removeEventListener('click', this.boundHandleJustifyFullClick);
+		
+		this.ButtonContainer.remove();
+		
+		// this.buttonContainer
+		// this.styles.bold.remove();
+        // this.styles.italic.remove();
+        // this.styles.underline.remove();
+        // this.styles.strikethrough.remove();
+        // this.styles.subscript.remove();
+        // this.styles.superscript.remove();
+		
+		// this.blocks.OL.remove();
+        // this.blocks.UL.remove();
 
-        this.blocks.OL.remove();
-        this.blocks.UL.remove();
-
-        this.blockFormats.Indent.removeEventListener('click', this.boundHandleIndentClick);
-        this.blockFormats.Outdent.removeEventListener('click', this.boundHandleOutdentClick);
-        this.blockFormats.JustifyLeft.removeEventListener('click', this.boundHandleJustifyLeftClick);
-        this.blockFormats.JustifyCenter.removeEventListener('click', this.boundHandleJustifyCenterClick);
-        this.blockFormats.JustifyRight.removeEventListener('click', this.boundHandleJustifyRightClick);
-        this.blockFormats.JustifyFull.removeEventListener('click', this.boundHandleJustifyFullClick);
-
-        this.blockFormats.Indent.remove();
-        this.blockFormats.Outdent.remove();
-        this.blockFormats.JustifyLeft.remove();
-        this.blockFormats.JustifyCenter.remove();
-        this.blockFormats.JustifyRight.remove();
-        this.blockFormats.JustifyFull.remove();
-
-        this.standardBlockOptions.remove();
-
+        // this.blockFormats.Indent.remove();
+        // this.blockFormats.Outdent.remove();
+        // this.blockFormats.JustifyLeft.remove();
+        // this.blockFormats.JustifyCenter.remove();
+        // this.blockFormats.JustifyRight.remove();
+        // this.blockFormats.JustifyFull.remove();
+		
+        // this.standardBlockOptions.remove();
+		// this.fontFamilySelector.remove();
+		// this.colorselector.remove();
+		// this.backgroundColorSelector.remove();
+		// this.fontsizeSelector.remove();
+		
         OpenEditors.delete(this.id);
-        //console.log(OpenEditors);
     }
+	RestoreOriginalContent() {
+		this.Page.innerHTML = "";
+		this.Page.appendChild(this.OriginalHTMLContent);
+	}
+	
+	Initialize() {
+        //this.Editor.classList.add(Active);
+        this.Page.classList.add(Active);
+			
+        if (this.Page.children.length === 0) {
+            let paragraph = this.CreateNewBlock();
+            this.Page.append(paragraph);
+        }
+		Array.from(this.Page.childNodes).forEach((child) => {
+			if(child.nodeType === Node.TEXT_NODE){
+				this.Page.removeChild(child);
+			}
+		});
+		document.getSelection().setPosition(this.GetFirstNode(this.Page), 0);
 
+        document.addEventListener('selectionchange', this.boundHandlePageSelectionChange);
+
+        this.Page.addEventListener('keydown', this.boundHandlePageKeyDown);
+        this.Page.addEventListener('focusout', this.boundHandlePageFocusOut);
+        this.Page.addEventListener('mouseup', this.boundHandlePageMouseUp);
+        this.Page.addEventListener('mousedown', this.boundHandlePageMouseDown);
+        this.Page.addEventListener('input', this.boundHandlePageInput);
+        this.Page.addEventListener('dragstart', this.boundHandlePageDragStart);
+        this.Page.addEventListener('drop', this.boundHandlePageDragDrop);
+        this.Page.addEventListener('paste', this.boundHandlePagePaste);
+    }
+	
+	
     HandlePageSelectionChange() {
         if (document.activeElement === this.Page) {
             this.ClearTargetSelections();
@@ -283,7 +537,7 @@ class RichTextEditorObject {
     }
 
     HandleStyleButtonClick(tag) {
-        this.ToggleTextFormat(tag);
+        this.ToggleTreeTag(tag);
     }
     HandleBlockStyleClick(tag) {
         this.ToggleBlockTag(tag);
@@ -291,47 +545,89 @@ class RichTextEditorObject {
     HandleBlockFormatClick(style) {
         this.ToggleBlockFormat(style);
     }
-    HandleStandardBlockSelectorClick(event) {
-
-        if (event.isTrusted) {
+    HandleStandardBlockOptionsChange(event) {
+        if (event.isTrusted) {			
             this.ChangeBlockType(this.standardBlockOptions.value);
         }
-
     }
 
-    Initialize() {
-        this.Editor.classList.add(Active);
-        this.Page.classList.add(Active);
-			
-        if (this.Page.children.length === 0) {
-            let paragraph = this.CreateNewBlock();
-            this.Page.append(paragraph);
-        }
-		Array.from(this.Page.childNodes).forEach((child) => {
-			if(child.nodeType === Node.TEXT_NODE){
-				this.Page.removeChild(child);
+	HandleTextColorOptionChange(event){
+		if(event.isTrusted) {
+			if(this.ColorSelector.value !== 'none'){				
+				if(this.ColorSelector.value === ExtraOptionStart.Value)
+					this.ToggleTreeStyle(this.RangeTree_Start.style.color, StyleType.Color);
+				else if(this.ColorSelector.value === ExtraOptionEnd.Value)
+					this.ToggleTreeStyle(this.RangeTree_End.style.color, StyleType.Color);
+				else
+					this.ToggleTreeStyle(this.ColorSelector.value, StyleType.Color);
 			}
-		});
-
-        document.addEventListener('selectionchange', this.boundHandlePageSelectionChange);
-
-        this.Page.addEventListener('keydown', this.boundHandlePageKeyDown);
-        this.Page.addEventListener('focusout', this.boundHandlePageFocusOut);
-        this.Page.addEventListener('mouseup', this.boundHandlePageMouseUp);
-        this.Page.addEventListener('mousedown', this.boundHandlePageMouseDown);
-        this.Page.addEventListener('input', this.boundHandlePageInput);
-        this.Page.addEventListener('dragstart', this.boundHandlePageDragStart);
-        this.Page.addEventListener('drop', this.boundHandlePageDragDrop);
-        this.Page.addEventListener('paste', this.boundHandlePagePaste);
-    }
+		}
+	}
+	HandleBackgroundColorOptionsChange(event){
+		if(event.isTrusted){
+			if(this.BackgroundColorSelector.value !== 'none') {
+				if(this.BackgroundColorSelector.value === ExtraOptionStart.Value)
+					this.ToggleTreeStyle(this.RangeTree_Start.style.backgroundColor, StyleType.BackgroundColor);
+				else if(this.BackgroundColorSelector.value === ExtraOptionEnd.Value)
+					this.ToggleTreeStyle(this.RangeTree_End.style.ackgroundColor, StyleType.BackgroundColor);
+				else
+					this.ToggleTreeStyle(this.BackgroundColorSelector.value, StyleType.BackgroundColor);
+			}
+		}
+	}
+	HandleFontSizeOptionsChange(event){
+		if(event.isTrusted){
+			if(this.FontSizeSelector.value !== 'none'){
+				if(this.FontSizeSelector.value === ExtraOptionStart.Value)
+					this.ToggleTreeStyle(this.RangeTree_Start.style.fontSize, StyleType.FontSize);
+				else if(this.FontSizeSelector.value === ExtraOptionEnd.Value)
+					this.ToggleTreeStyle(this.RangeTree_End.style.fontSize, StyleType.FontSize);
+				else
+					this.ToggleTreeStyle(this.FontSizeSelector.value, StyleType.FontSize);
+			}
+		}
+	}
+	
+	HandleFontFamilyOptionsChange(event) {
+		if(event.isTrusted) {
+			if(this.FontFamilySelector.value !== 'none') {
+				if(this.FontFamilySelector.value === ExtraOptionStart.Value)
+					this.ToggleTreeStyle(this.RangeTree_Start.style.fontFamily, StyleType.FontFamily);
+				else if(this.FontFamilySelector.value === ExtraOptionEnd.Value)
+					this.ToggleTreeStyle(this.RangeTree_End.style.fontFamily, StyleType.FontFamily);
+				else
+					this.ToggleTreeStyle(this.FontFamilySelector.value, StyleType.FontFamily)
+			}
+		}
+	}
 	
 	CreateButtonContainer(){
 		let container = document.createElement('div');
 		container.classList.add(ConstButtonContainerStyles);
-
-		this.Editor.children[0].append(container);			
+		this.Page.previousSibling.prepend(container);		
+		//this.Editor.children[0].append(container);			
 		return container;
 	}
+
+	CreateBasicTag_Buttons(buttonContainer){
+		let buttons = {
+			bold: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleBoldClick, '&#914', 'Bold'),
+            italic: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleItalicClick, '&#1030', 'Italic'),
+            underline: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleUnderlineClick, '&#9078', 'Underline'),
+		}
+		return buttons;
+	}
+	
+	CreateAdvancedTag_Buttons(buttonContainer){
+		let buttons = {
+			strikethrough: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleStrikeClick, 'S', 'Strike Through'),
+            superscript: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleSuperscriptClick, 'X<sup>2</sup>', 'Superscript'),
+            subscript: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleSubscriptClick, 'X<sub>2</sub>', 'Subscript'),
+		}
+		return buttons;
+	}
+	
+
 
     CreateStyleButtons(containerid) {
         let styles = {
@@ -359,25 +655,7 @@ class RichTextEditorObject {
         selector.addEventListener('change', this.boundHandleBlockOptionsClick);
         return selector
     }
-
-    AddNewOption(value, text) {
-        let option = document.createElement('option');
-        option.value = value;
-        option.innerHTML = text;
-
-        return option;
-    }
-
-    CreateBlockButtons(containerid) {
-        let blocks = {
-            OL: this.NewClickButton(containerid, this.boundHandleOrderedListClick, '&#9776', 'Ordered List'),
-            UL: this.NewClickButton(containerid, this.boundHandleUnorderedListClick, '&#9783', 'Unordered List')
-        }
-
-        return blocks;
-    }
-
-    CreateBlockFormatButtons(containerid) {
+	CreateStandardBlockFormatButtons(containerid) {
         let formats = {
             Indent: this.NewClickButton(containerid, this.boundHandleIndentClick, '&#8640', 'Indent'),
             Outdent: this.NewClickButton(containerid, this.boundHandleOutdentClick, '&#8636', 'Outdent'),
@@ -389,14 +667,101 @@ class RichTextEditorObject {
 
         return formats;
     }
+	
+	CreateFontColorSelector(container) {
+		let selector = document.createElement('select');
+		selector.title = "Font Color";
+		container.append(selector);
+		selector.appendChild(this.AddNewOption("none", "Font Color"));
+		selector.appendChild(this.AddNewOption(ExtraOptionStart.Value, ExtraOptionStart.Desc));
+		selector.appendChild(this.AddNewOption(ExtraOptionEnd.Value, ExtraOptionEnd.Desc));
+		Array.from(ConstColorOptions).forEach((color) => {
+			if(color[1] === ConstDefaultFontColor)
+				selector.appendChild(this.AddNewOption('', ConstDefaultFontColor));
+			else
+				selector.appendChild(this.AddNewOption(color[0], color[1]));
+		});
+		selector.addEventListener('change', this.boundHandleTextColorOptionChange);
+		return selector;
+	}
+	
+	CreateBackgroundColorSelector(container){
+		let selector = document.createElement('select')
+		selector.title = "Background Color";
+		container.append(selector);
+		selector.appendChild(this.AddNewOption("none", "Background Color"));
+		selector.appendChild(this.AddNewOption(ExtraOptionStart.Value, ExtraOptionStart.Desc));
+		selector.appendChild(this.AddNewOption(ExtraOptionEnd.Value, ExtraOptionEnd.Desc));
+		Array.from(ConstColorOptions).forEach((color) => {
+			if(color[1] === ConstDefaultBackgroundColor)
+				selector.appendChild(this.AddNewOption("", ConstDefaultBackgroundColor));
+			else
+				selector.appendChild(this.AddNewOption(color[0], color[1]));
+		});
+		selector.addEventListener('change', this.boundHandleBackgroundColorOptionsChange);
+		return selector;
+	}
+	
+	CreateFontSizeSelector(container){
+		let selector = document.createElement('select');
+		selector.title = "Font Size";
+		container.append(selector);
+		selector.appendChild(this.AddNewOption("none", "Font Size"));
+		selector.appendChild(this.AddNewOption(ExtraOptionStart.Value, ExtraOptionStart.Desc));
+		selector.appendChild(this.AddNewOption(ExtraOptionEnd.Value, ExtraOptionEnd.Desc));
+		Array.from(ConstFontSizes).forEach((fontsize) => {
+			if(fontsize === ConstDefaultFontSize)
+				selector.appendChild(this.AddNewOption('', fontsize));
+			else
+				selector.appendChild(this.AddNewOption(fontsize, fontsize));
+		});
+		selector.addEventListener('change', this.boundHandleFontSizeOptionsChange);
+		return selector;
+	}
+	
+	CreateFontFamilySelector(container){
+		let selector = document.createElement('select');
+		selector.title = "Font Family";
+		container.append(selector);
+		selector.appendChild(this.AddNewOption("none", "Font Family"));
+		selector.appendChild(this.AddNewOption(ExtraOptionStart.Value, ExtraOptionStart.Desc));
+		selector.appendChild(this.AddNewOption(ExtraOptionEnd.Value, ExtraOptionEnd.Desc));
+		Array.from(ConstFontFamilies).forEach((font) => {
+			if(font === ConstDefaultFontFamily)
+				selector.appendChild(this.AddNewOption('', ConstDefaultFontFamily));
+			else
+				selector.appendChild(this.AddNewOption(font, font));
+		});
+		selector.addEventListener('change', this.boundHandleFontFamilyOptionsChange);
+		return selector;
+	}
+
+    AddNewOption(value, text) {
+        let option = document.createElement('option');
+        option.value = value;
+        option.innerHTML = text;
+
+        return option;
+    }
+
+    CreateListBlockButtons(buttonsContainer) {
+        let blocks = {
+            OL: this.NewClickButton(buttonsContainer, this.ListBlock_Bindings.boundHandleOrderedListClick, '&#9776', 'Ordered List'),
+            UL: this.NewClickButton(buttonsContainer, this.ListBlock_Bindings.boundHandleUnorderedListClick, '&#9783', 'Unordered List')
+        }
+        return blocks;
+    }
+
+
 
     NewClickButton(container, handleBinding, text, description) {
         let button = document.createElement('button');
         button.classList = ConstButtonStyle;
         button.innerHTML = text;
         button.title = description;
-        container.appendChild(button);
 
+        container.appendChild(button);
+		
         button.addEventListener('click', handleBinding);
 
         return button;
@@ -754,7 +1119,8 @@ class RichTextEditorObject {
         let length = 0;
         if (treeNode.nextSibling !== null) {
             if (treeNode.nextSibling.textContent.length !== 0) {
-                if (this.Core_hasIdentical_Tags(treeNode, treeNode.nextSibling) === true) {
+                if (this.Core_hasIdentical_Tags(treeNode, treeNode.nextSibling) === true &&
+					this.Core_hasIdenticalStyle(treeNode, treeNode.nextSibling) === true) {
                     this.GetTreeNode(treeNode).textContent += treeNode.nextSibling.textContent;
                     treeNode.nextSibling.remove();
                 }
@@ -771,11 +1137,13 @@ class RichTextEditorObject {
         let length = 0;
         if (treeNode.previousSibling !== null) {
             if (treeNode.previousSibling.textContent.length !== 0) {
-                if (this.Core_hasIdentical_Tags(treeNode, treeNode.previousSibling) === true) {
-                    //console.log('merging previous');
-                    if (treeNode.previousSibling === this.RangeTree_Start) {
-                        this.RangeTree_Start = treeNode;
-                    }
+                if (this.Core_hasIdentical_Tags(treeNode, treeNode.previousSibling) === true &&
+					this.Core_hasIdenticalStyle(treeNode, treeNode.previousSibling) === true){
+                    
+                     //if (treeNode.previousSibling === this.RangeTree_Start) {
+						 //+console.log('DONtDELETEYET');
+                         //this.RangeTree_Start = treeNode;
+                     //}
                     let textNode = this.GetTreeNode(treeNode);
                     length = treeNode.previousSibling.textContent.length;
 
@@ -787,7 +1155,7 @@ class RichTextEditorObject {
         }
         return length;
     }
-
+	
     Core_hasIdentical_Tags(anchorTreeNode, siblingTreeNode) {
         let isEqual = true;
 
@@ -826,6 +1194,21 @@ class RichTextEditorObject {
         }
         return test;
     }
+	
+	Core_hasIdenticalStyle(treenode, siblingtree) {
+		let samestyles = true;
+		if(treenode.style.color != siblingtree.style.color)
+			samestyles = false;
+		if(treenode.style.fontFamily != siblingtree.style.fontFamily)
+			samestyles = false;
+		if(treenode.style.backgroundColor != siblingtree.style.backgroundColor)
+			samestyles = false;
+		if(treenode.style.fontSize != siblingtree.style.fontSize)
+			samestyles = false;
+		
+		return samestyles;
+	}
+	
 
     atContainerStart(container, range) {
         let atStart = false;
@@ -938,8 +1321,8 @@ class RichTextEditorObject {
     Core_DivideContainer_New_End(container, TagString) {
         let range = document.getSelection().getRangeAt(0);
         let deepclone = new CloneWithRange(container, range);
-        let clonedelement = deepclone.GetEnd_nonInclusive(TagString);
-        container.insertAdjacentElement('afterend', clonedelement);
+        let backhalf = deepclone.GetEnd_nonInclusive(TagString);
+        container.insertAdjacentElement('afterend', backhalf);
 
         let tempRange = document.createRange();
         tempRange.selectNodeContents(container);
@@ -950,14 +1333,14 @@ class RichTextEditorObject {
 		if(this.isEmptyTag(container.lastChild)){
 			container.removeChild(container.lastChild);			
 		}
-
+		//copy Styles - won't worry if its been kicked out of the dom tree
+		return backhalf;
     }
 
     Core_DivideContainer_New_Front(container, TagString) {
         let range = document.getSelection().getRangeAt(0);
         let deepclone = new CloneWithRange(container, range);
         let fronthalf = deepclone.GetFront_nonInclusive(TagString);
-
         container.insertAdjacentElement('beforebegin', fronthalf);
 
         let temprange = document.createRange();
@@ -968,8 +1351,10 @@ class RichTextEditorObject {
         if (this.isEmptyTag(container.firstChild)) {
             container.firstChild.remove();
         }
+		//Copy Styles
+		return fronthalf;
     }
-
+	
     Core_ImplementTag_Tree(container, tag, behavior) {
         if (container.textContent.length !== 0) {
             let styledelement = container.querySelector(tag);
@@ -1177,16 +1562,124 @@ class RichTextEditorObject {
         document.getSelection().addRange(range);
 
     }
-    //Applies a Style to the selected text
-    //If a button is clicked, it changes the focus and selection.
-    //Function needs to capture the text node and the offset to put the caret back on the text node.
-    ToggleTextFormat(StyleTag) {
-        let selection = document.getSelection();
+	
+	CopyContainerStyles(anchorTree, newTree){
+		if(newTree.textContent.length !== 0){
+			newTree.style.color = anchorTree.style.color;
+			newTree.style.fontFamily = anchorTree.style.fontFamily;
+			newTree.style.backgroundColor = anchorTree.style.backgroundColor;			
+			newTree.style.fontSize = anchorTree.style.fontSize;
+		}
+	}
+	
+	ApplyNewStyle(targetContainer, style, styleType){
+		if(styleType == StyleType.Color)
+			targetContainer.style.color = style;
+		else if(styleType == StyleType.FontFamily) 
+			targetContainer.style.fontFamily = style;		
+		else if(styleType == StyleType.BackgroundColor)
+			targetContainer.style.backgroundColor = style;
+		else if(styleType == StyleType.FontSize)
+			targetContainer.style.fontSize = style;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	ToggleTreeStyle(style, styleType){
+
+		let selection = document.getSelection();
         if (selection.type === 'Caret') {
             this.Selection_LazySelector_Word();
         }
 		let range = selection.getRangeAt(0);
+
+		if (selection.type === 'Range') {
+            if (this.RangeTree_Start === this.RangeTree_End) {
+
+                if (selection.toString().trim().length !== this.RangeTree_Start.textContent.trim().length) {
+                    if (this.atContainerStart(this.RangeTree_Start, range) === true) {
+                        let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+						this.CopyContainerStyles(this.RangeTree_Start, end);
+                    }
+                    else {
+                        if (this.atContainerEnd(this.RangeTree_End, range) === false) {
+                            let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+							this.CopyContainerStyles(this.RangeTree_Start, end);
+                        }
+                        let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
+						this.CopyContainerStyles(this.RangeTree_Start, front);					
+                    }
+                }
+                let caretPosition = this.RangeTree_Start.textContent.length;
+                let offset = 0;
+							
+				this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+                offset = this.Core_MergeIdenticalTrees(this.RangeTree_Start);
+				selection.setPosition(this.GetTreeNode(this.RangeTree_End), caretPosition + offset);					
+            }
+            else {
+                //Figure out if I'm adding or Removing Tags
+                //let behavior = this.Core_DetermineStyleBehavior(StyleTag);
+                let caretStartPosition = 0;
+                let caretEndPosition = range.endOffset;
+
+                if (range.startOffset !== 0) {
+                    //Function 1
+                    let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
+                    this.CopyContainerStyles(this.RangeTree_Start, front);
+					//this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+                }
+                //else { //Handle the RangeTree_Start to calculate the caretStartPosition
+					this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+                    caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
+                //}
+
+                //Possible Selection Patterns for Middle Nodes
+                //1. Entire Tree iter is Selected
+                let iter = { block: this.StartBlock, tree: this.RangeTree_Start.nextSibling };
+                let tempiter = this.RangeTree_Start;
+                while (iter.tree !== this.RangeTree_End) {
+                    if (iter.tree === null) {
+                        iter = this.Block_Traversal_Find_First_Tree_In_NextBlock(iter.block, tempiter);
+                    }
+                    else {
+                        this.ApplyNewStyle(iter.tree, style, styleType);
+                        this.Core_MergeIdenticalTree_Previous(iter.tree);
+                        tempiter = iter.tree;
+                        iter.tree = iter.tree.nextSibling;
+                    }
+                }
+
+                //Possible Selection Patterns for 
+                //1. Entire End Tree is Selected - divide not necessary
+                //2. Front Half of End Tree is Selected - Do division
+                if (this.atContainerEnd(this.RangeTree_End, range) === false) {
+                    let end = this.Core_DivideContainer_New_End(this.RangeTree_End, ConstTree);
+					this.CopyContainerStyles(this.RangeTree_End, end);
+                }
+                this.ApplyNewStyle(this.RangeTree_End, style, styleType);
+                caretEndPosition += this.Core_MergeIdenticalTrees(this.RangeTree_End);
+
+                //Set the Range
+                let selectionRange = this.Core_Set_Range_Selection(caretStartPosition, caretEndPosition);
+                selection.removeAllRanges();
+                selection.addRange(selectionRange);
+            }
+
+        }
 		
+		
+		
+	}
+	
+    //Applies a Style to the selected text
+    //If a button is clicked, it changes the focus and selection.
+    //Function needs to capture the text node and the offset to put the caret back on the text node.
+    ToggleTreeTag(StyleTag) {
+		let selection = document.getSelection();
+        if (selection.type === 'Caret') {
+            this.Selection_LazySelector_Word();
+        }
+		let range = selection.getRangeAt(0);
         //Solution
         //1. Divide Containers from selection to maintain 1 text node per a tree container
         //2. Preserve target container during divide
@@ -1201,17 +1694,17 @@ class RichTextEditorObject {
                 if (selection.toString().trim().length !== this.RangeTree_Start.textContent.trim().length) {
                     //Function 1
                     if (this.atContainerStart(this.RangeTree_Start, range) === true) {
-                        //Pattern 2
-                        this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+                        let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+						this.CopyContainerStyles(this.RangeTree_Start, end);
                     }
                     else {
-                        //Function 3 - Divides Container into 3 parts, end is optional
-                        //Process the End first to preserve the integrity of the original range's startOffset
+
                         if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                            this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+                            let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, ConstTree);
+							this.CopyContainerStyles(this.RangeTree_Start, end);
                         }
-                        //call Pattern 2
-                        this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
+                        let start = this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
+						this.CopyContainerStyles(this.RangeTree_Start, start);
                     }
                 }
                 let caretPosition = this.RangeTree_Start.textContent.length;
@@ -1234,14 +1727,15 @@ class RichTextEditorObject {
                 //1. Entire Start Tree is Selected
                 //2. Back Half of Start Tree is Selected
                 if (range.startOffset !== 0) {
-                    //Function 1
-                    this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
-                    this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
+                    let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, ConstTree);
+					this.CopyContainerStyles(this.RangeTree_Start, front);
+                    //this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
+					
                 }
-                else { //Handle the RangeTree_Start to calculate the caretStartPosition
+                //else { //Handle the RangeTree_Start to calculate the caretStartPosition
                     this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
                     caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
-                }
+                //}
 
                 //Possible Selection Patterns for Middle Nodes
                 //1. Entire Tree iter is Selected
@@ -1263,7 +1757,8 @@ class RichTextEditorObject {
                 //1. Entire End Tree is Selected - divide not necessary
                 //2. Front Half of End Tree is Selected - Do division
                 if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                    this.Core_DivideContainer_New_End(this.RangeTree_End, ConstTree);
+                    let end = this.Core_DivideContainer_New_End(this.RangeTree_End, ConstTree);
+					this.CopyContainerStyles(this.RangeTree_Start, end);
                 }
                 this.Core_ImplementTag_Tree(this.RangeTree_End, StyleTag, behavior);
                 caretEndPosition += this.Core_MergeIdenticalTrees(this.RangeTree_End);
@@ -1401,7 +1896,29 @@ class RichTextEditorObject {
     }
 
     ToggleInterfaceButtons() {
-        this.standardBlockOptions.value = this.StartBlock.tagName;
+		if(this.StandardBlockSelector !== null)
+			this.StandardBlockSelector.value = this.StartBlock.tagName;
+		if(document.getSelection().type === 'Caret'){
+			if(this.FontFamilySelector !== null)
+				this.FontFamilySelector.value = this.RangeTree_Start.style.fontFamily;
+			if(this.ColorSelector !== null)
+				this.ColorSelector.value = this.RangeTree_Start.style.color;
+			if(this.BackgroundColorSelector !== null)
+				this.BackgroundColorSelector.value = this.RangeTree_Start.style.backgroundColor;
+			if(this.FontSizeSelector !== null)
+				this.FontSizeSelector.value = this.RangeTree_Start.style.fontSize;
+		}
+		else{
+			if(this.FontFamilySelector !== null)
+				this.FontFamilySelector.value = "none";
+			if(this.ColorSelector !== null)
+				this.ColorSelector.value = "none";
+			if(this.BackgroundColorSelector !== null)
+				this.BackgroundColorSelector.value = "none";
+			if(this.FontSizeSelector !== null)
+				this.FontSizeSelector.value = "none";
+		}
+
     }
 
     // CHanges the background Color of selected styles
@@ -1825,7 +2342,7 @@ class CloneWithRange {
         Array.from(OriginalContainer.childNodes).forEach((child) => {
             let clonedChild = child.cloneNode(true);
             this.fragment.appendChild(clonedChild);
-            //console.log(child);
+            //console.log(clonedChild.style.color);
             //Traverse the OriginalContainer to find map the cloned start and end to the fragment
 
             //A Forward Traversal means the Start Container is found first
@@ -1971,7 +2488,7 @@ class CloneWithRange {
     GetFront_Inclusive(ElementTag) {
         let element = document.createElement(ElementTag);
         element.appendChild(this.fragment);
-
+		
         this.range.selectNodeContents(element);
         this.range.setStart(this.EndNode, this.EndOffset);
         this.range.deleteContents();

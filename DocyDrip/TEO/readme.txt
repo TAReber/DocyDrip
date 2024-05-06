@@ -1,5 +1,7 @@
 DocyDrip - Text Editor Obejct
 By: Tyler Reber
+Version 0.2
+
 
 TEO - Rich Text Object TEO is a single class that creates objects that Creates the buttons, the events and manages how the structure 
 is built inside the DOM Tree 

@@ -1,7 +1,4 @@
-﻿.event-edit-basicsegment {
-}
-
-.DocyDrip-TEO-Selector-Event {
+﻿.DocyDrip-TEO-Selector-Event {
 	width:fit-content;
 	height:fit-content;	
 	transform: 50px;
@@ -21,56 +18,68 @@
 	border: 2px solid red;
 }
 
-
-
-.DocyDrip.TEO.ButtonContainer {
-	position:sticky;
-	top:0;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-    justify-content: space-between;
+.DocyDrip-TEO-ObjectCreator {
+		position:absolute;
+		font-size: 1.2rem;
+		left: 100%;
 }
 
-.DocyDrip-TEO-ObjectCreator::marker {
+.DocyDrip-TEO-BlueBook::marker {
     content: "📘";
+	
+	
 }
-	[open] .DocyDrip-TEO-ObjectCreator::marker {
+	[open] .DocyDrip-TEO-BlueBook::marker {
 		content: "📖";
 	}
 
 .DocyDrip-TEO-Editable-Container {
 	font-family: "Arial";
 	min-height: 50px;
+	width:100%;
 	border: 1px solid black;
+	
 }
 .DocyDrip-TEO-Editable-Container.Active {
-	max-width: 100%;
-    width: 99%;
+	max-width: 99%;
     border-radius: 5px;
     padding: 2px;
     background-color: #fff;
     box-shadow: 0px 0px 5px 0px #7df;
 }
 
-
-
-.teo-button-container {
-    transition: all 0.2s ease-in-out;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
+.DocyDrip-TEO-UI-Anchor {
+	position:relative;
+	width:100%;
 }
 
-    /* .rte-button-container.expanded { */
-        /* height: 100%; */
-        /* width: 100%; */
-    /* } */
+.DocyDrip-TEO-UI-Box {
+	/* position:absolute; */
+	top: -50px;
+	display:flex;
+	flex-direction: row;
+    justify-content: space-between;
+ 
+}
 
-.teo-btn {
+.DocyDrip-TEO-UI-Box-Ends {	
+	margin: 1px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.DocyDrip-TEO-Button-Group {
+	width:fit-content;	
+	margin: 4px;
+	display: flex;
+	flex-direction: row;
+}
+.DocyDrip-TEO-Button-Group button {
+	margin: 1px;
 	display: inline-block;
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: 11px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
@@ -82,23 +91,46 @@
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-rte-btn:hover {
+.DocyDrip-TEO-Button-Group:hover {
+	background-color: #ccc;
+    color: #555;
+    border-color: #bbb;
+}
+
+
+/* .DocyDrip-TEO-Button-Style { */
+
+/* } */
+
+.DocyDrip-TEO-Button-Style:hover {
 	background-color: #ddd;
     color: #555;
     border-color: #bbb;
 }
 
-rte-btn:active {
-	background-color: #bbb;
-    color: #333;
-    border-color: #999;
-}
+/* .DocyDrip-TEO-Button-Style:active { */
+	/* background-color: #bbb; */
+    /* color: #333; */
+    /* border-color: #999; */
+/* } */
 
 p {
     word-wrap: break-word;
     overflow-wrap:anywhere;   
 }
 
+.DocyDrip-TEO-Selector-Style {
+	width: 80px;
+	height: 30px;
+
+	margin:2px;
+	background-color: #f0f0f0;
+	padding: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	cursor: pointer;
+	position: relative;
+}
 
 
 li {

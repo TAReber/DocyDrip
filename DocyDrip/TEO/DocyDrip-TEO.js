@@ -35,21 +35,19 @@ function Event_DripDocs_TEO_Selector() {
 }
 
 function Add_OpenEditor_Toggles(){
-	let toggles = document.querySelectorAll('.DocyDrip-TEO-Editable-Container');
-	Array.from(toggles).forEach((editablElement) => {
-		let buttonContainer = document.createElement('div');
-		buttonContainer.classList.add('.DocyDrip.TEO.ButtonContainer');
-		editablElement.insertAdjacentElement('beforebegin', buttonContainer);
+	let queryTargets = document.querySelectorAll('.DocyDrip-TEO-Editable-Container');
+	Array.from(queryTargets).forEach((editableElement) => {
 				
 		let details = document.createElement('details');
-		buttonContainer.appendChild(details);
+		details.classList.add('DocyDrip-TEO-ObjectCreator');
+		editableElement.parentNode.prepend(details);
 		let summary = document.createElement('summary');
-		summary.classList.add('DocyDrip-TEO-ObjectCreator');
+		summary.classList.add('DocyDrip-TEO-BlueBook');
 		details.appendChild(summary);
+		
 		summary.addEventListener('click', function() {
-			DocyDrip_OpenEditor_Event(editablElement);
-		});
-			
+			DocyDrip_OpenEditor_Event(editableElement);
+		});			
 	});
 }
 
@@ -57,7 +55,7 @@ function Remove_OpenEditor_Toggles(){
 	if(OpenEditors.size > 0){
 		let result = window.confirm(`Editor Current Open: ${OpenEditors.count}, Press OK to Save, Cancel to Discard`);
 		OpenEditors.forEach((texteditorobject, key) => {
-			if(result = false){
+			if(result === false){
 				texteditorobject.RestoreOriginalContent();
 			}
 			texteditorobject.destroy();
@@ -65,10 +63,12 @@ function Remove_OpenEditor_Toggles(){
 		});	
 	}
 
-	let toggles = document.querySelectorAll('.DocyDrip-TEO-Editable-Container');
-	Array.from(toggles).forEach((editableElement) => {
-		if(editableElement.previousSibling.classList.contains('.DocyDrip.TEO.ButtonContainer'))
-			editableElement.previousSibling.remove();
+	let toggles = document.querySelectorAll('.DocyDrip-TEO-ObjectCreator');
+
+	Array.from(toggles).forEach((bluebook) => {
+		bluebook.remove();
+		// if(editableElement.previousSibling.classList.contains('DocyDrop-TEO-ObjectCreator'))
+			// editableElement.previousSibling.remove();
 	});
 }
 
@@ -105,10 +105,11 @@ const ConstOList = 'OL';
 const ConstListItem = 'LI';
 
 //CSS CLASS Globals
-const ConstEditorBody = '#docydrip-teo-body';
-const ConstButtonContainerStyles = 'teo-button-container'
-const ConstButtonStyle = 'teo-btn';
-
+const ClassUIButtonContainer = 'DocyDrip-TEO-UI-Box';
+const ClassButtonUIFlexEnds = 'DocyDrip-TEO-UI-Box-Ends';
+const ClassButtonGroupBox = 'DocyDrip-TEO-Button-Group';
+const ClassButtonClickStyle = 'DocyDrip-TEO-Button-Style';
+const ClassSelectorStyle = 'DocyDrip-TEO-Selector-Style';
 
 //Options
 const ClassIndent = 'indent';
@@ -122,12 +123,10 @@ const BlockClasses = [ClassJustifyLeft, ClassJustifyCenter, ClassJustifyRight, C
 //BitWise Constants //No Extras = 0
 const Bit_BasicTags = 1; // (1) Bold, Italic, Underline
 const Bit_AdvancedTags = (1 << 1); // (2) Strikethrough, Subscript, SuperScirpt
-
 const Bit_FontColorsOptions = (1 << 2); // (4)
 const Bit_FontBackgroundColorOptions = (1 << 3); // (8)
 const Bit_FontSizeOptions = (1 << 4); // (16)
 const Bit_FontFamilyOptions = (1 << 5);  // (32)
-
 const Bit_StandardHeaders = (1 << 6); //  (64)  H1 - H6
 const Bit_StandardBlockFormats = (1 << 7); // (128)   Standard Block Alignment and justify
 const Bit_ListBlocks = (1 << 8); //  (256)   Ordered and Unordered Lists
@@ -201,13 +200,14 @@ const ExtraOptionEnd = {
 class RichTextEditorObject {
 
     constructor(editableContainer, data) {
-		this.Page = editableContainer; //container.querySelector(ConstEditorBody);
+		this.Page = editableContainer;
         this.Page.contentEditable = true;
 		this.id = this.Page.id;
 		OpenEditors.set(this.id, this);
-		this.ButtonContainer = this.CreateButtonContainer();
 		
-		        //Targeting Variables Surrounding Selections and clicking
+		this.UIContainer = this.CreateUIContainer(); //2 Children, first for Styling UI, Last for Settings.
+
+		//Targeting Variables Surrounding Selections and clicking
         this.StartBlock = null;
         this.EndBlock = null;
         this.RangeTree_Start = null;
@@ -242,7 +242,7 @@ class RichTextEditorObject {
 				boundHandleItalicClick: this.HandleStyleButtonClick.bind(this, 'I'),
 				boundHandleUnderlineClick: this.HandleStyleButtonClick.bind(this, 'U')
 			}
-			this.BasicTags_Buttons = this.CreateBasicTag_Buttons(this.ButtonContainer);
+			this.BasicTags_Buttons = this.CreateBasicTag_Buttons(this.UIContainer.firstChild);
 		}
 
 		this.AdvancedTags_Bindings;
@@ -253,35 +253,35 @@ class RichTextEditorObject {
 				boundHandleSuperscriptClick: this.HandleStyleButtonClick.bind(this, 'SUP'),
 				boundHandleSubscriptClick: this.HandleStyleButtonClick.bind(this, 'SUB')
 			}
-			this.AdvancedTags_Buttons = this.CreateAdvancedTag_Buttons(this.ButtonContainer);
+			this.AdvancedTags_Buttons = this.CreateAdvancedTag_Buttons(this.UIContainer.firstChild);
 		}
 		
 		this.boundHandleTextColorOptionChange = null;
 		this.ColorSelector = null;
 		if(this.Options & Bit_FontColorsOptions){
 			this.boundHandleTextColorOptionChange = this.HandleTextColorOptionChange.bind(this);
-			this.ColorSelector = this.CreateFontColorSelector(this.ButtonContainer);
+			this.ColorSelector = this.CreateFontColorSelector(this.UIContainer.firstChild);
 		}
 		
 		this.boundHandleBackgroundColorOptionsChange = null;
 		this.BackgroundColorSelector = null;
 		if(this.Options & Bit_FontBackgroundColorOptions) {
 			this.boundHandleBackgroundColorOptionsChange = this.HandleBackgroundColorOptionsChange.bind(this);
-			this.BackgroundColorSelector = this.CreateBackgroundColorSelector(this.ButtonContainer);
+			this.BackgroundColorSelector = this.CreateBackgroundColorSelector(this.UIContainer.firstChild);
 		}
 		
 		this.boundHandleFontSizeOptionsChange = null;
 		this.FontSizeSelector = null;
 		if(this.Options & Bit_FontSizeOptions) {
 			this.boundHandleFontSizeOptionsChange = this.HandleFontSizeOptionsChange.bind(this);
-			this.FontSizeSelector = this.CreateFontSizeSelector(this.ButtonContainer);
+			this.FontSizeSelector = this.CreateFontSizeSelector(this.UIContainer.firstChild);
 		}
 		
 		this.boundHandleFontFamilyOptionsChange = null;
 		this.FontFamilySelector = null;	
 		if(this.Options & Bit_FontFamilyOptions){
 			this.boundHandleFontFamilyOptionsChange = this.HandleFontFamilyOptionsChange.bind(this);
-			this.FontFamilySelector = this.CreateFontFamilySelector(this.ButtonContainer);	
+			this.FontFamilySelector = this.CreateFontFamilySelector(this.UIContainer.firstChild);	
 		}
 		
 		
@@ -289,7 +289,7 @@ class RichTextEditorObject {
 		this.StandardBlockSelector = null;
 		if(this.Options & Bit_StandardHeaders) {
 			this.boundHandleStandardBlockOptionsChange = this.HandleStandardBlockOptionsChange.bind(this);
-			this.StandardBlockSelector = this.CreateStandardBlockOptions(this.ButtonContainer);
+			this.StandardBlockSelector = this.CreateStandardBlockOptions(this.UIContainer.firstChild);
 		}
 		
 		this.StandardBlockFormats_Bindings = null;
@@ -303,7 +303,7 @@ class RichTextEditorObject {
 				boundHandleJustifyRightClick: this.HandleBlockFormatClick.bind(this, ClassJustifyRight),
 				boundHandleJustifyFullClick: this.HandleBlockFormatClick.bind(this, ClassJustifyFull)
 			}
-			this.StandardBlockFormat_Buttons = this.CreateStandardBlockFormatButtons(this.ButtonContainer);
+			this.StandardBlockFormat_Buttons = this.CreateStandardBlockFormatButtons(this.UIContainer.firstChild);
 		}
 		
 		this.ListBlock_Bindings = null;
@@ -313,7 +313,7 @@ class RichTextEditorObject {
 				boundHandleOrderedListClick: this.HandleBlockStyleClick.bind(this, 'OL'),
 				boundHandleUnorderedListClick: this.HandleBlockStyleClick.bind(this, 'UL')
 			}
-			this.ListBlock_Buttons = this.CreateListBlockButtons(this.ButtonContainer);
+			this.ListBlock_Buttons = this.CreateListBlockButtons(this.UIContainer.firstChild);
 		}
 		//Not Implemented
 		if(this.Options & Bit_ListBlockFormats){
@@ -390,35 +390,12 @@ class RichTextEditorObject {
 			//No Formats Exist, or might ever exist.
 		}
 
-		this.ButtonContainer.remove();
-		
-		// this.buttonContainer
-		// this.styles.bold.remove();
-        // this.styles.italic.remove();
-        // this.styles.underline.remove();
-        // this.styles.strikethrough.remove();
-        // this.styles.subscript.remove();
-        // this.styles.superscript.remove();
-		
-		// this.blocks.OL.remove();
-        // this.blocks.UL.remove();
-
-        // this.blockFormats.Indent.remove();
-        // this.blockFormats.Outdent.remove();
-        // this.blockFormats.JustifyLeft.remove();
-        // this.blockFormats.JustifyCenter.remove();
-        // this.blockFormats.JustifyRight.remove();
-        // this.blockFormats.JustifyFull.remove();
-		
-        // this.standardBlockOptions.remove();
-		// this.fontFamilySelector.remove();
-		// this.colorselector.remove();
-		// this.backgroundColorSelector.remove();
-		// this.fontsizeSelector.remove();
-		
+		this.UIContainer.remove();
+	
         OpenEditors.delete(this.id);
     }
 	RestoreOriginalContent() {
+		console.log('restoring');
 		this.Page.innerHTML = "";
 		this.Page.appendChild(this.OriginalHTMLContent);
 	}
@@ -574,48 +551,86 @@ class RichTextEditorObject {
 		}
 	}
 	
-	CreateButtonContainer(){
+	CreateUIContainer(){
+		let UIContainer = document.createElement('div');
+		UIContainer.classList.add(ClassUIButtonContainer); 
+		this.Page.insertAdjacentElement('beforebegin', UIContainer);
+		
+		let BtnBoxone = document.createElement('div');
+		BtnBoxone.classList.add(ClassButtonUIFlexEnds);
+		UIContainer.prepend(BtnBoxone);
+		
+		let BtnBoxtwo = document.createElement('div');
+		BtnBoxtwo.classList.add(ClassButtonUIFlexEnds);
+		UIContainer.prepend(BtnBoxtwo);
+		return UIContainer;
+	}
+	
+	CreateGroupContainer(){
 		let container = document.createElement('div');
-		container.classList.add(ConstButtonContainerStyles);
-		this.Page.previousSibling.prepend(container);		
-		//this.Editor.children[0].append(container);			
+		container.classList.add(ClassButtonGroupBox);				
 		return container;
 	}
 
-	CreateBasicTag_Buttons(buttonContainer){
-		let buttons = {
-			bold: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleBoldClick, '&#914', 'Bold'),
-            italic: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleItalicClick, '&#1030', 'Italic'),
-            underline: this.NewClickButton(buttonContainer, this.BasicTags_Bindings.boundHandleUnderlineClick, '&#9078', 'Underline'),
-		}
-		return buttons;
+	CreateBasicTag_Buttons(buttonContainer){		
+		let bold = this.NewClickButton(this.BasicTags_Bindings.boundHandleBoldClick, '&#914', 'Bold');
+        let italic = this.NewClickButton(this.BasicTags_Bindings.boundHandleItalicClick, '&#1030', 'Italic');
+        let underline = this.NewClickButton(this.BasicTags_Bindings.boundHandleUnderlineClick, '&#9078', 'Underline');
+
+		let box = this.CreateGroupContainer();
+		box.append(bold, italic, underline);
+		buttonContainer.append(box);
+
+		return { bold, italic, underline};
 	}
 	
 	CreateAdvancedTag_Buttons(buttonContainer){
-		let buttons = {
-			strikethrough: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleStrikeClick, 'S', 'Strike Through'),
-            superscript: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleSuperscriptClick, 'X<sup>2</sup>', 'Superscript'),
-            subscript: this.NewClickButton(buttonContainer, this.AdvancedTags_Bindings.boundHandleSubscriptClick, 'X<sub>2</sub>', 'Subscript'),
-		}
-		return buttons;
+		let strikethrough = this.NewClickButton(this.AdvancedTags_Bindings.boundHandleStrikeClick, 'S', 'Strike Through');
+        let superscript = this.NewClickButton(this.AdvancedTags_Bindings.boundHandleSuperscriptClick, 'X<sup>2</sup>', 'Superscript');
+        let subscript = this.NewClickButton(this.AdvancedTags_Bindings.boundHandleSubscriptClick, 'X<sub>2</sub>', 'Subscript');
+
+		let box = this.CreateGroupContainer();
+		box.append(strikethrough, superscript, subscript);
+		buttonContainer.append(box);
+		return {strikethrough, superscript, subscript };
 	}
+		
+	CreateStandardBlockFormatButtons(buttonContainer) {
+        let Indent = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleIndentClick, '&#8640', 'Indent');
+        let Outdent = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleOutdentClick, '&#8636', 'Outdent');
+        let JustifyLeft = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleJustifyLeftClick, '&#8676', 'Justify Left');
+        let JustifyCenter = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleJustifyCenterClick, '&#8633', 'Justify Center');
+        let JustifyRight = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleJustifyRightClick, '&#8677', 'Justify Right');
+        let JustifyFull = this.NewClickButton(this.StandardBlockFormats_Bindings.boundHandleJustifyFullClick, '&#8700', 'Justify Full');
+        let newBox = this.CreateGroupContainer();
+
+		newBox.append(Indent, Outdent, JustifyLeft, JustifyCenter, JustifyRight, JustifyFull);
+		buttonContainer.append(newBox);
+        return {Indent, Outdent, JustifyLeft, JustifyCenter, JustifyRight, JustifyFull};
+    }
 	
-
-
-    CreateStyleButtons(containerid) {
-        let styles = {
-            bold: this.NewClickButton(containerid, this.boundHandleBoldClick, '&#914', 'Bold'),
-            italic: this.NewClickButton(containerid, this.boundHandleItalicClick, '&#1030', 'Italic'),
-            underline: this.NewClickButton(containerid, this.boundHandleUnderlineClick, '&#9078', 'Underline'),
-            strikethrough: this.NewClickButton(containerid, this.boundHandleStrikeClick, 'S', 'Strike Through'),
-            superscript: this.NewClickButton(containerid, this.boundHandleSuperscriptClick, 'X<sup>2</sup>', 'Superscript'),
-            subscript: this.NewClickButton(containerid, this.boundHandleSubscriptClick, 'X<sub>2</sub>', 'Subscript'),
-        }
-        return styles;
+	    CreateListBlockButtons(buttonContainer) {
+        let OL = this.NewClickButton(this.ListBlock_Bindings.boundHandleOrderedListClick, '&#9776', 'Ordered List');
+        let UL = this.NewClickButton(this.ListBlock_Bindings.boundHandleUnorderedListClick, '&#9783', 'Unordered List');
+        let box = this.CreateGroupContainer();
+		box.append(OL, UL);
+		buttonContainer.append(box);
+        return {OL, UL};
     }
 
-    CreateStandardBlockOptions(container) {
+    NewClickButton(handleBinding, text, description) {
+        let button = document.createElement('button');
+        button.classList = ClassButtonClickStyle;
+        button.innerHTML = text;
+        button.title = description;	
+        button.addEventListener('click', handleBinding);
+
+        return button;
+    }
+	
+	CreateStandardBlockOptions(container) {
         let selector = document.createElement('select');
+		selector.classList.add(ClassSelectorStyle);
         container.append(selector);
         selector.appendChild(this.AddNewOption(ConstBlock, 'Paragraph'));
         selector.appendChild(this.AddNewOption(ConstH1, 'Header 1'));
@@ -628,21 +643,11 @@ class RichTextEditorObject {
         selector.addEventListener('change', this.boundHandleStandardBlockOptionsChange);
         return selector
     }
-	CreateStandardBlockFormatButtons(containerid) {
-        let formats = {
-            Indent: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleIndentClick, '&#8640', 'Indent'),
-            Outdent: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleOutdentClick, '&#8636', 'Outdent'),
-            JustifyLeft: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyLeftClick, '&#8676', 'Justify Left'),
-            JustifyCenter: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyCenterClick, '&#8633', 'Justify Center'),
-            JustifyRight: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyRightClick, '&#8677', 'Justify Right'),
-            JustifyFull: this.NewClickButton(containerid, this.StandardBlockFormats_Bindings.boundHandleJustifyFullClick, '&#8700', 'Justify Full'),
-        }
 
-        return formats;
-    }
 	
 	CreateFontColorSelector(container) {
 		let selector = document.createElement('select');
+		selector.classList.add(ClassSelectorStyle);
 		selector.title = "Font Color";
 		container.append(selector);
 		selector.appendChild(this.AddNewOption("none", "Font Color"));
@@ -660,6 +665,7 @@ class RichTextEditorObject {
 	
 	CreateBackgroundColorSelector(container){
 		let selector = document.createElement('select')
+		selector.classList.add(ClassSelectorStyle);
 		selector.title = "Background Color";
 		container.append(selector);
 		selector.appendChild(this.AddNewOption("none", "Background Color"));
@@ -677,6 +683,7 @@ class RichTextEditorObject {
 	
 	CreateFontSizeSelector(container){
 		let selector = document.createElement('select');
+		selector.classList.add(ClassSelectorStyle);
 		selector.title = "Font Size";
 		container.append(selector);
 		selector.appendChild(this.AddNewOption("none", "Font Size"));
@@ -694,6 +701,7 @@ class RichTextEditorObject {
 	
 	CreateFontFamilySelector(container){
 		let selector = document.createElement('select');
+		selector.classList.add(ClassSelectorStyle);
 		selector.title = "Font Family";
 		container.append(selector);
 		selector.appendChild(this.AddNewOption("none", "Font Family"));
@@ -717,28 +725,6 @@ class RichTextEditorObject {
         return option;
     }
 
-    CreateListBlockButtons(buttonsContainer) {
-        let blocks = {
-            OL: this.NewClickButton(buttonsContainer, this.ListBlock_Bindings.boundHandleOrderedListClick, '&#9776', 'Ordered List'),
-            UL: this.NewClickButton(buttonsContainer, this.ListBlock_Bindings.boundHandleUnorderedListClick, '&#9783', 'Unordered List')
-        }
-        return blocks;
-    }
-
-
-
-    NewClickButton(container, handleBinding, text, description) {
-        let button = document.createElement('button');
-        button.classList = ConstButtonStyle;
-        button.innerHTML = text;
-        button.title = description;
-
-        container.appendChild(button);
-		
-        button.addEventListener('click', handleBinding);
-
-        return button;
-    }
 
     Selection_KeyInput(event) {
         console.log(event);
@@ -1113,10 +1099,10 @@ class RichTextEditorObject {
                 if (this.Core_hasIdentical_Tags(treeNode, treeNode.previousSibling) === true &&
 					this.Core_hasIdenticalStyle(treeNode, treeNode.previousSibling) === true){
                     
-                     //if (treeNode.previousSibling === this.RangeTree_Start) {
-						 //+console.log('DONtDELETEYET');
-                         //this.RangeTree_Start = treeNode;
-                     //}
+					//This stops some kind of edge that was causing an issue setting the range
+                    if (treeNode.previousSibling === this.RangeTree_Start) {
+                        this.RangeTree_Start = treeNode;
+                    }
                     let textNode = this.GetTreeNode(treeNode);
                     length = treeNode.previousSibling.textContent.length;
 
@@ -1366,7 +1352,6 @@ class RichTextEditorObject {
         else {
             selectionRange.setEnd(end.parentNode, endoffset);
         }
-
         return selectionRange;
     }
 
@@ -1709,7 +1694,7 @@ class RichTextEditorObject {
                     this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
                     caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
                 //}
-
+				
                 //Possible Selection Patterns for Middle Nodes
                 //1. Entire Tree iter is Selected
                 let iter = { block: this.StartBlock, tree: this.RangeTree_Start.nextSibling };

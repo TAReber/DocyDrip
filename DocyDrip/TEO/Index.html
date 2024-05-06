@@ -6,7 +6,7 @@
 	<link href="DemoStyles.css" rel="stylesheet" />
 </head>
 	<main>
-		<body>
+		<body style="margin: 10% 15%;">
 			<div class="box-col">
 				<div class="box-row box-center1">
 					<span class="text-center justify-center" style="height: 100px; width:100px;">click the paper and pen</span>
@@ -18,15 +18,15 @@
 			
 					<div class="box-col">
 						<input type="text" id="input1" value="1023"/>
-						<input type="submit" value="Submit1" onclick="update_one(this)">
+						<input type="submit" value="Top Editor" onclick="update_one(this)">
 					</div>
 					<div class="box-col">
 						<input type="text" id="input2" value="362"/>
-						<input type="submit" value="Submit2" onclick="update_two(this)">
+						<input type="submit" value="Middle Editor" onclick="update_two(this)">
 					</div>
 					<div class="box-col">
 						<input type="text" id="input3" value="724">
-						<input type="submit" value="Submit3" onclick="update_three(this)">
+						<input type="submit" value="Bottom Editor" onclick="update_three(this)">
 					</div>
 				
 				</div>
@@ -34,14 +34,24 @@
 			</div>
 			<br>
 			<br>
-			<div class="box-col">
-				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="1023" id='001'>
-				</div>	
-				<br>
-				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="362" id='002'>
+			<div class="box-col w100">
+				
+				<div class="DocyDrip-TEO-UI-Anchor">
+					<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="1023" id='001'>
+						<p><span>Top Editor set to 1023, Alter the values to load a different editor.</span></p>
+					</div>	
 				</div>
+				
 				<br>
-				<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="724" id='003'>
+				
+				<div class="DocyDrip-TEO-UI-Anchor">				
+					<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="362" id='002'></div>	
+				</div>
+				
+				<br>
+				
+				<div class="DocyDrip-TEO-UI-Anchor">
+					<div class="DocyDrip-TEO-Editable-Container" data-TEO-BitCode="724" id='003'></div>	
 				</div>
 
 			</div>

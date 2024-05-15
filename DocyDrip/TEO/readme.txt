@@ -1,12 +1,35 @@
 DocyDrip - Text Editor Obejct
 By: Tyler Reber
-Version 0.2
+Version 0.5 - Alpha
+
+CORS POLICY Error AND SOLUTION - FOR BEGINNERS
+Refactor is Separating UI Files and Global Constants into a new file. This means that I will be importing and exporting variables between these 2 files. When I change a script to a type of module, it will will cause the CORS policy error.
+
+I think the CORS Policy Error is to prevent the JavaScript code from calling and accessing files on your personal computer. I suspect that its a security feature.
+
+SOLUTION
+Solution involves launching a server to test Development on. 
+
+My chosen development environment is notepad++, specifcally to cache these kinds of issues without the having to deal with the nuances that come with bulky IDE like visual studio.
+https://www.apachefriends.org/
+Video how to set it up.
+https://www.youtube.com/watch?v=k9em7Ey00xQ&t
+
+I went to the Installation Folder and Pasted in the solution
+C:\xampp\htdocs\TEO
+	header('Location: '.$uri.'/TEO/');  // Replace dashbored Path '/dashboard/' with '/TEO/'
+
+Run the Server and type in Local host into the browser.
 
 
 TEO - Rich Text Object TEO is a single class that creates objects that Creates the buttons, the events and manages how the structure 
 is built inside the DOM Tree 
 Disclaimer - Alpha release still has a few areas I haven't decided the best way to address, I'm still 
 considering way to make it more user friendly and easier for people to customize. I might refactor some of the names.
+
+This Editor was split into 3 seperate Files, TEO Class, UI File and the globals file.
+The TEO Object works the same regardless of the User Interface. Everything related to the UI is packed into a seperate file to give the developer easier access to Customizing the UI.
+the Globals File stores commonly used strings to also allow the developer to use custom tags unique to his site.
 
 
 The Editor Works With Custom Classes, Variable names are stored in const global declarations at the top of the file.

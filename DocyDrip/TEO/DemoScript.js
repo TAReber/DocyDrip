@@ -1,3 +1,6 @@
+//This Script is Not required for the TEO,
+// It Merely Updates the a value for the data attribute 
+
 function update_one(){
 	let element = document.getElementById('input1');
 	let editor = document.getElementById('001');

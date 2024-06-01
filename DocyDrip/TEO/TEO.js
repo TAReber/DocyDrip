@@ -11,16 +11,18 @@
 //Text Editor Object That Can be Created Created And Deleted Freely
 // While remaining Isolated from Adjacent Text Editors
 //import * as Globals from "./TEO-UI.js";
-import {ObjectMap, Active, Bit, Const, Void, StandardStructureArray, ListStructures, 
-StandardBlockStyles_textalign, StandardBlockStyles_textindent, ExtraOptionStart, ExtraOptionEnd } from "./TEO-Globals.js";
+import {
+    ObjectMap, Active, Bit, Const, Void, StandardStructureArray, ListStructures,
+    StandardBlockStyles_textalign, StandardBlockStyles_textindent, ExtraOptionStart, ExtraOptionEnd
+} from "./TEO-Globals.js";
 
 import * as UI from "./TEO-UI.js";
 
 const StyleType = {
-	Color: 1,
-	FontFamily: 2,
-	BackgroundColor: 3,
-	FontSize: 4
+    Color: 1,
+    FontFamily: 2,
+    BackgroundColor: 3,
+    FontSize: 4
 }
 
 const Behavior = {
@@ -31,107 +33,108 @@ const Behavior = {
 
 export class TextEditorObject {
     constructor(editableContainer, data) {
-		this.Page = editableContainer;
+        this.Page = editableContainer;
         this.Page.contentEditable = true;
-		this.id = this.Page.id;
-		ObjectMap.set(this.id, this);
-		this.UIContainer = UI.CreateUIContainer(this.Page);
+        this.id = this.Page.id;
+        ObjectMap.set(this.id, this);
+        this.UIContainer = UI.CreateUIContainer(this.Page);
 
-		//Targeting Variables Surrounding Selections and clicking
+        //Targeting Variables Surrounding Selections and clicking
         this.StartBlock = null;
         this.EndBlock = null;
         this.RangeTree_Start = null;
         this.RangeTree_End = null;
-        this.XTargetStart = null;
-        this.XTargetEnd = null;
-				
-		if(data === null){
-			data = 511;		
-		}		
-		this.Options = data;
-		
-		//Essential Editor Behaviors
+
+        if (data === null) {
+            data = 511;
+        }
+        this.Options = data;
+
+        //Essential Editor Behaviors
         this.boundHandlePageSelectionChange = this.HandlePageSelectionChange.bind(this);
 
         this.boundHandlePageKeyDown = this.HandlePageKeyDown.bind(this);
         this.boundHandlePageFocusOut = this.HandlePageFocusOut.bind(this);
-        this.boundHandlePageMouseUp = this.HandlePageMouseUp.bind(this);
-        this.boundHandlePageMouseDown = this.HandlePageMouseDown.bind(this);
-        this.boundHandlePageInput = this.HandlePageInputEvent.bind(this);
         this.boundHandlePageDragStart = this.HandlePageDragStart.bind(this);
         this.boundHandlePageDragDrop = this.HandlePageDragDrop.bind(this);
         this.boundHandlePagePaste = this.HandlePagePasteText.bind(this);
-		this.Initialize();
+        this.Initialize();
 
-		this.BasicTags_Bindings = null;
-		this.BasicTags_Buttons = null;
-		if(this.Options & Bit.BasicTags){
-			this.BasicTags_Buttons = this.Initialize_BasicTag_Bindings();
-		}
+        this.BasicTags_Bindings = null;
+        this.BasicTags_Buttons = null;
+        if (this.Options & Bit.BasicTags) {
+            this.BasicTags_Buttons = this.Initialize_BasicTag_Bindings();
+        }
 
-		this.AdvancedTags_Bindings = null;
-		this.AdvancedTags_Buttons = null;
-		if(this.Options & Bit.AdvancedTags){
-			this.AdvancedTags_Buttons = this.Initialize_AdvancedTag_Bindings();
-		}
-		
-		this.boundHandleTextColorOptionChange = null;
-		this.ColorSelector = null;
-		if(this.Options & Bit.FontColorsOptions){
-			this.ColorSelector = this.Initialize_TextColorSelector_Bindings();
+        this.AdvancedTags_Bindings = null;
+        this.AdvancedTags_Buttons = null;
+        if (this.Options & Bit.AdvancedTags) {
+            this.AdvancedTags_Buttons = this.Initialize_AdvancedTag_Bindings();
+        }
 
-		}
-		
-		this.boundHandleBackgroundColorOptionsChange = null;
-		this.BackgroundColorSelector = null;
-		if(this.Options & Bit.FontBackgroundColorOptions) {
-			this.BackgroundColorSelector = this.Initialize_BackgroundColor_Bindings();
-		}
-		
-		this.boundHandleFontSizeOptionsChange = null;
-		this.FontSizeSelector = null;
-		if(this.Options & Bit.FontSizeOptions) {
-			this.FontSizeSelector = this.Initialize_FontSizeSelector_Bindings();
-		}
-		
-		this.boundHandleFontFamilyOptionsChange = null;
-		this.FontFamilySelector = null;	
-		if(this.Options & Bit.FontFamilyOptions){
-			this.FontFamilySelector = this.Initialize_FontFamily_Bindings();
-		}
-		
-		
-		this.boundHandleStandardBlockOptionsChange = null;
-		this.StandardBlockSelector = null;
-		if(this.Options & Bit.StandardHeaders) {
-			this.StandardBlockSelector = this.Initialize_StandardBlockSelector();
-		}
-		
-		this.StandardBlockTextIndent_Bindings = null;
-		this.StandardBlockTextAlign_Bindings = null;
-		this.StandardTextIndent_Buttons = null;
-		this.StandardTextAlignment_Buttons = null;
-		if(this.Options & Bit.StandardBlockStyles){
-			this.StandardTextIndent_Buttons = this.Initialize_StandardTextIndent_Bindings();
-			this.StandardTextAlignment_Buttons = this.Initialize_StandardTextAlignment_Bindings();
-		}
-	
-		this.ListBlock_Bindings = null;
-		this.ListBlock_Buttons = null;
-		if(this.Options & Bit.ListBlocks){
-			this.ListBlock_Buttons = this.Initialize_ListBlock_Bindings();
-		}
-		//Not Implemented
-		if(this.Options & Bit.ListBlockFormats){
-			//console.log('non existent list Options include');
-		}
-	
-		let range = document.createRange();
-		range.selectNodeContents(this.Page);
-		this.OriginalHTMLContent = range.cloneContents();
+        this.Link_Bindings = null;
+        this.Link_Buttons = null;
+        if (this.Options & Bit.Links) {
+            this.Link_Buttons = this.Initialize_Link_Bindings();
+        }
+
+        this.boundHandleTextColorOptionChange = null;
+        this.ColorSelector = null;
+        if (this.Options & Bit.FontColorsOptions) {
+            this.ColorSelector = this.Initialize_TextColorSelector_Bindings();
+
+        }
+
+        this.boundHandleBackgroundColorOptionsChange = null;
+        this.BackgroundColorSelector = null;
+        if (this.Options & Bit.FontBackgroundColorOptions) {
+            this.BackgroundColorSelector = this.Initialize_BackgroundColor_Bindings();
+        }
+
+        this.boundHandleFontSizeOptionsChange = null;
+        this.FontSizeSelector = null;
+        if (this.Options & Bit.FontSizeOptions) {
+            this.FontSizeSelector = this.Initialize_FontSizeSelector_Bindings();
+        }
+
+        this.boundHandleFontFamilyOptionsChange = null;
+        this.FontFamilySelector = null;
+        if (this.Options & Bit.FontFamilyOptions) {
+            this.FontFamilySelector = this.Initialize_FontFamily_Bindings();
+        }
+
+
+        this.boundHandleStandardBlockOptionsChange = null;
+        this.StandardBlockSelector = null;
+        if (this.Options & Bit.StandardHeaders) {
+            this.StandardBlockSelector = this.Initialize_StandardBlockSelector();
+        }
+
+        this.StandardBlockTextIndent_Bindings = null;
+        this.StandardBlockTextAlign_Bindings = null;
+        this.StandardTextIndent_Buttons = null;
+        this.StandardTextAlignment_Buttons = null;
+        if (this.Options & Bit.StandardBlockStyles) {
+            this.StandardTextIndent_Buttons = this.Initialize_StandardTextIndent_Bindings();
+            this.StandardTextAlignment_Buttons = this.Initialize_StandardTextAlignment_Bindings();
+        }
+
+        this.ListBlock_Bindings = null;
+        this.ListBlock_Buttons = null;
+        if (this.Options & Bit.ListBlocks) {
+            this.ListBlock_Buttons = this.Initialize_ListBlock_Bindings();
+        }
+        //Not Implemented
+        if (this.Options & Bit.ListBlockFormats) {
+            //console.log('non existent list Options include');
+        }
+
+        let range = document.createRange();
+        range.selectNodeContents(this.Page);
+        this.OriginalHTMLContent = range.cloneContents();
 
     }
-	
+
     destroy() {
         //console.log('Destroying Object');
         this.Page.classList.remove(Active);
@@ -140,169 +143,172 @@ export class TextEditorObject {
 
         this.Page.removeEventListener('keydown', this.boundHandlePageKeyDown);
         this.Page.removeEventListener('focusout', this.boundHandlePageFocusOut);
-        this.Page.removeEventListener('mouseup', this.boundHandlePageMouseUp);
-        this.Page.removeEventListener('mousedown', this.boundHandlePageDown);
-        this.Page.removeEventListener('input', this.boundHandlePageInput);
         this.Page.removeEventListener('dragstart', this.boundHandlePageDragStart);
         this.Page.removeEventListener('drop', this.boundHandlePageDragDrop);
         this.Page.removeEventListener('paste', this.boundHandlePagePaste);
-				
-		if(this.Options & Bit.BasicTags){
-			this.BasicTags_Buttons.bold.removeEventListener('click', this.BasicTags_Bindings.boundHandleBoldClick);
-			this.BasicTags_Buttons.italic.removeEventListener('click', this.BasicTags_Bindings.boundHandleItalicClick);
-			this.BasicTags_Buttons.underline.removeEventListener('click', this.BasicTags_Bindings.boundHandleUnderlineClick);
-		}		
-		if(this.Options & Bit.AdvancedTags){
-			this.AdvancedTags_Buttons.strikethrough.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleStrikeThroughClick);
-			this.AdvancedTags_Buttons.subscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSubscriptClick);
-			this.AdvancedTags_Buttons.superscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSuperscriptClick);
-		}		
-		if(this.Options & Bit.FontColorsOptions){
-			this.ColorSelector.removeEventListener('change', this.boundHandleTextColorOptionChange);
-		}
-		
-		if(this.Options & Bit.FontBackgroundColorOptions) {
-			this.BackgroundColorSelector.removeEventListener('change', this.boundHandleBackgroundColorOptionsChange);
-		}
-		
-		if(this.Options & Bit.FontSizeOptions) {
-			this.FontSizeSelector.removeEventListener('change', this.boundHandleFontSizeOptionsChange);
-		}
-		
-		if(this.Options & Bit.FontFamilyOptions){
-			this.FontFamilySelector.removeEventListener('change', this.boundHandleFontFamilyOptionsChange);
-		}
-				
-		if(this.Options & Bit.StandardHeaders) {
-			this.StandardBlockSelector.removeEventListener('change', this.boundHandleStandardBlockOptionsChange);
-		}
-		
-		if(this.Options & Bit.StandardBlockStyles){
-			this.StandardTextIndent_Buttons.Indent.removeEventListener('click', this.StandardBlockTextIndent_Bindings.boundHandleIndentClick);
-			this.StandardTextIndent_Buttons.Outdent.removeEventListener('click', this.StandardBlockTextIndent_Bindings.boundHandleOutdentClick);
-			this.StandardTextAlignment_Buttons.JustifyLeft.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyLeftClick);
-			this.StandardTextAlignment_Buttons.JustifyCenter.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyCenterClick);
-			this.StandardTextAlignment_Buttons.JustifyRight.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyRightClick);
-			this.StandardTextAlignment_Buttons.JustifyFull.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyFullClick);
-		}
-		
-		if(this.Options & Bit.ListBlocks){
-			this.ListBlock_Buttons.OL.removeEventListener('click', this.ListBlock_Bindings.boundHandleOrderedListClick),
-			this.ListBlock_Buttons.UL.removeEventListener('click', this.ListBlock_Bindings.boundHandleUnorderedListClick)
-		}
-		
-		if(this.Options & Bit.ListBlockFormats){
-			//No Formats Exist, or might ever exist.
-		}
 
-		this.UIContainer.remove();
-	
+        if (this.Options & Bit.BasicTags) {
+            this.BasicTags_Buttons.bold.removeEventListener('click', this.BasicTags_Bindings.boundHandleBoldClick);
+            this.BasicTags_Buttons.italic.removeEventListener('click', this.BasicTags_Bindings.boundHandleItalicClick);
+            this.BasicTags_Buttons.underline.removeEventListener('click', this.BasicTags_Bindings.boundHandleUnderlineClick);
+        }
+        if (this.Options & Bit.AdvancedTags) {
+            this.AdvancedTags_Buttons.strikethrough.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleStrikeThroughClick);
+            this.AdvancedTags_Buttons.subscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSubscriptClick);
+            this.AdvancedTags_Buttons.superscript.removeEventListener('click', this.AdvancedTags_Bindings.boundHandleSuperscriptClick);
+        }
+        if (this.Options & Bit.Links) {
+            this.Link_Buttons.link.removeEventListener('click', this.Link_Bindings.boundHandleLinkClick);
+            this.Link_Buttons.unlink.removeEventListener('click', this.Link_Bindings.boundHandleUnLinkClick);
+        }
+        if (this.Options & Bit.FontColorsOptions) {
+            this.ColorSelector.removeEventListener('change', this.boundHandleTextColorOptionChange);
+        }
+
+        if (this.Options & Bit.FontBackgroundColorOptions) {
+            this.BackgroundColorSelector.removeEventListener('change', this.boundHandleBackgroundColorOptionsChange);
+        }
+
+        if (this.Options & Bit.FontSizeOptions) {
+            this.FontSizeSelector.removeEventListener('change', this.boundHandleFontSizeOptionsChange);
+        }
+
+        if (this.Options & Bit.FontFamilyOptions) {
+            this.FontFamilySelector.removeEventListener('change', this.boundHandleFontFamilyOptionsChange);
+        }
+
+        if (this.Options & Bit.StandardHeaders) {
+            this.StandardBlockSelector.removeEventListener('change', this.boundHandleStandardBlockOptionsChange);
+        }
+
+        if (this.Options & Bit.StandardBlockStyles) {
+            this.StandardTextIndent_Buttons.Indent.removeEventListener('click', this.StandardBlockTextIndent_Bindings.boundHandleIndentClick);
+            this.StandardTextIndent_Buttons.Outdent.removeEventListener('click', this.StandardBlockTextIndent_Bindings.boundHandleOutdentClick);
+            this.StandardTextAlignment_Buttons.JustifyLeft.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyLeftClick);
+            this.StandardTextAlignment_Buttons.JustifyCenter.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyCenterClick);
+            this.StandardTextAlignment_Buttons.JustifyRight.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyRightClick);
+            this.StandardTextAlignment_Buttons.JustifyFull.removeEventListener('click', this.StandardBlockTextAlign_Bindings.boundHandleJustifyFullClick);
+        }
+
+        if (this.Options & Bit.ListBlocks) {
+            this.ListBlock_Buttons.OL.removeEventListener('click', this.ListBlock_Bindings.boundHandleOrderedListClick),
+                this.ListBlock_Buttons.UL.removeEventListener('click', this.ListBlock_Bindings.boundHandleUnorderedListClick)
+        }
+
+        if (this.Options & Bit.ListBlockFormats) {
+            //No Formats Exist, or might ever exist.
+        }
+
+        this.UIContainer.remove();
+
         ObjectMap.delete(this.id);
     }
-	
-	RestoreOriginalContent() {
-		console.log('restoring');
-		this.Page.innerHTML = "";
-		this.Page.appendChild(this.OriginalHTMLContent);
-	}
-	
-	Initialize() {
+
+    RestoreOriginalContent() {
+        console.log('restoring');
+        this.Page.innerHTML = "";
+        this.Page.appendChild(this.OriginalHTMLContent);
+    }
+
+    Initialize() {
         //this.Editor.classList.add(Active);
         this.Page.classList.add(Active);
-			
+
         if (this.Page.children.length === 0) {
             let paragraph = this.CreateNewBlock();
             this.Page.append(paragraph);
         }
-		Array.from(this.Page.childNodes).forEach((child) => {
-			if(child.nodeType === Node.TEXT_NODE){
-				this.Page.removeChild(child);
-			}
-		});
-		document.getSelection().setPosition(this.GetFirstNode(this.Page), 0);
+        let firstTree = this.Page.querySelector(Const.Tree);
+        let tail = this.GetTailofTree(firstTree);
+        document.getSelection().setPosition(tail, 0);
 
         document.addEventListener('selectionchange', this.boundHandlePageSelectionChange);
 
         this.Page.addEventListener('keydown', this.boundHandlePageKeyDown);
         this.Page.addEventListener('focusout', this.boundHandlePageFocusOut);
-        this.Page.addEventListener('mouseup', this.boundHandlePageMouseUp);
-        this.Page.addEventListener('mousedown', this.boundHandlePageMouseDown);
-        this.Page.addEventListener('input', this.boundHandlePageInput);
         this.Page.addEventListener('dragstart', this.boundHandlePageDragStart);
         this.Page.addEventListener('drop', this.boundHandlePageDragDrop);
         this.Page.addEventListener('paste', this.boundHandlePagePaste);
     }
-				
-	Initialize_BasicTag_Bindings(){
-		this.BasicTags_Bindings = {
-			boundHandleBoldClick: this.HandleStyleButtonClick.bind(this, 'B'),
-			boundHandleItalicClick: this.HandleStyleButtonClick.bind(this, 'I'),
-			boundHandleUnderlineClick: this.HandleStyleButtonClick.bind(this, 'U')
-		}		
-		return UI.CreateBasicTag_Buttons(this.UIContainer, this.BasicTags_Bindings);
-	}
-	
-	Initialize_AdvancedTag_Bindings() {
-		this.AdvancedTags_Bindings = {
-			boundHandleStrikeClick: this.HandleStyleButtonClick.bind(this, 'STRIKE'),
-			boundHandleSuperscriptClick: this.HandleStyleButtonClick.bind(this, 'SUP'),
-			boundHandleSubscriptClick: this.HandleStyleButtonClick.bind(this, 'SUB')
-		}	
-		return UI.CreateAdvancedTag_Buttons(this.UIContainer, this.AdvancedTags_Bindings);
-	}
-	
-	Initialize_StandardTextIndent_Bindings(){
-		this.StandardBlockTextIndent_Bindings = {
-			boundHandleIndentClick: this.HandleStandardBlockIndentClick.bind(this, StandardBlockStyles_textindent.indent),
-			boundHandleOutdentClick: this.HandleStandardBlockIndentClick.bind(this, StandardBlockStyles_textindent.outdent),
-		}	
-		return UI.CreateStandardBlockTextIndent_Buttons(this.UIContainer, this.StandardBlockTextIndent_Bindings);
-	};
-	
-	Initialize_StandardTextAlignment_Bindings(){
-		this.StandardBlockTextAlign_Bindings = {
-			boundHandleJustifyLeftClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.left),
-			boundHandleJustifyCenterClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.center),
-			boundHandleJustifyRightClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.right),
-			boundHandleJustifyFullClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.full)
-		}
-		return UI.CreateStandardBlockTextAlignment_Buttons(this.UIContainer, this.StandardBlockTextAlign_Bindings);
-	};
-			
-	Initialize_ListBlock_Bindings(){
-		this.ListBlock_Bindings = {
-				boundHandleOrderedListClick: this.HandleBlockStyleClick.bind(this, 'OL'),
-				boundHandleUnorderedListClick: this.HandleBlockStyleClick.bind(this, 'UL')
-		};
-		return UI.CreateListBlockButtons(this.UIContainer, this.ListBlock_Bindings);
-	};
 
-	Initialize_StandardBlockSelector(){
-		this.boundHandleStandardBlockOptionsChange = this.HandleStandardBlockOptionsChange.bind(this);
-		return UI.CreateStandardBlockOptions(this.UIContainer, this.boundHandleStandardBlockOptionsChange);
-	}
+    Initialize_BasicTag_Bindings() {
+        this.BasicTags_Bindings = {
+            boundHandleBoldClick: this.HandleStyleButtonClick.bind(this, 'B'),
+            boundHandleItalicClick: this.HandleStyleButtonClick.bind(this, 'I'),
+            boundHandleUnderlineClick: this.HandleStyleButtonClick.bind(this, 'U')
+        }
+        return UI.CreateBasicTag_Buttons(this.UIContainer, this.BasicTags_Bindings);
+    }
 
-	Initialize_TextColorSelector_Bindings(){
-		this.boundHandleTextColorOptionChange = this.HandleTextColorOptionChange.bind(this);
-		return UI.CreateFontColorSelector(this.UIContainer, this.boundHandleTextColorOptionChange);
-	}
-	
-	Initialize_BackgroundColor_Bindings(){
-		this.boundHandleBackgroundColorOptionsChange = this.HandleBackgroundColorOptionsChange.bind(this);
-		return UI.CreateBackgroundColorSelector(this.UIContainer, this.boundHandleBackgroundColorOptionsChange);
-	}
-		
-	Initialize_FontFamily_Bindings(){
-		this.boundHandleFontFamilyOptionsChange = this.HandleFontFamilyOptionsChange.bind(this);
-		return UI.CreateFontFamilySelector(this.UIContainer, this.boundHandleFontFamilyOptionsChange);	
-	}
-				
-	Initialize_FontSizeSelector_Bindings(){
-		this.boundHandleFontSizeOptionsChange = this.HandleFontSizeOptionsChange.bind(this);
-		return UI.CreateFontSizeSelector(this.UIContainer, this.boundHandleFontSizeOptionsChange);
-	}
+    Initialize_Link_Bindings() {
+        this.Link_Bindings = {
+            boundHandleLinkClick: this.HandleLinkButtonClick.bind(this, Behavior.Add),
+            boundHandleUnLinkClick: this.HandleLinkButtonClick.bind(this, Behavior.Remove)
+        }
+        return UI.CreateLinkButton(this.UIContainer, this.Link_Bindings);
+    }
 
-	HandlePageSelectionChange() {
+    Initialize_AdvancedTag_Bindings() {
+        this.AdvancedTags_Bindings = {
+            boundHandleStrikeClick: this.HandleStyleButtonClick.bind(this, 'STRIKE'),
+            boundHandleSuperscriptClick: this.HandleStyleButtonClick.bind(this, 'SUP'),
+            boundHandleSubscriptClick: this.HandleStyleButtonClick.bind(this, 'SUB')
+        }
+        return UI.CreateAdvancedTag_Buttons(this.UIContainer, this.AdvancedTags_Bindings);
+    }
+
+    Initialize_StandardTextIndent_Bindings() {
+        this.StandardBlockTextIndent_Bindings = {
+            boundHandleIndentClick: this.HandleStandardBlockIndentClick.bind(this, StandardBlockStyles_textindent.indent),
+            boundHandleOutdentClick: this.HandleStandardBlockIndentClick.bind(this, StandardBlockStyles_textindent.outdent),
+        }
+        return UI.CreateStandardBlockTextIndent_Buttons(this.UIContainer, this.StandardBlockTextIndent_Bindings);
+    };
+
+    Initialize_StandardTextAlignment_Bindings() {
+        this.StandardBlockTextAlign_Bindings = {
+            boundHandleJustifyLeftClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.left),
+            boundHandleJustifyCenterClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.center),
+            boundHandleJustifyRightClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.right),
+            boundHandleJustifyFullClick: this.HandleStandardBlockTextAlignClick.bind(this, StandardBlockStyles_textalign.full)
+        }
+        return UI.CreateStandardBlockTextAlignment_Buttons(this.UIContainer, this.StandardBlockTextAlign_Bindings);
+    };
+
+    Initialize_ListBlock_Bindings() {
+        this.ListBlock_Bindings = {
+            boundHandleOrderedListClick: this.HandleBlockStyleClick.bind(this, 'OL'),
+            boundHandleUnorderedListClick: this.HandleBlockStyleClick.bind(this, 'UL')
+        };
+        return UI.CreateListBlockButtons(this.UIContainer, this.ListBlock_Bindings);
+    };
+
+    Initialize_StandardBlockSelector() {
+        this.boundHandleStandardBlockOptionsChange = this.HandleStandardBlockOptionsChange.bind(this);
+        return UI.CreateStandardBlockOptions(this.UIContainer, this.boundHandleStandardBlockOptionsChange);
+    }
+
+    Initialize_TextColorSelector_Bindings() {
+        this.boundHandleTextColorOptionChange = this.HandleTextColorOptionChange.bind(this);
+        return UI.CreateFontColorSelector(this.UIContainer, this.boundHandleTextColorOptionChange);
+    }
+
+    Initialize_BackgroundColor_Bindings() {
+        this.boundHandleBackgroundColorOptionsChange = this.HandleBackgroundColorOptionsChange.bind(this);
+        return UI.CreateBackgroundColorSelector(this.UIContainer, this.boundHandleBackgroundColorOptionsChange);
+    }
+
+    Initialize_FontFamily_Bindings() {
+        this.boundHandleFontFamilyOptionsChange = this.HandleFontFamilyOptionsChange.bind(this);
+        return UI.CreateFontFamilySelector(this.UIContainer, this.boundHandleFontFamilyOptionsChange);
+    }
+
+    Initialize_FontSizeSelector_Bindings() {
+        this.boundHandleFontSizeOptionsChange = this.HandleFontSizeOptionsChange.bind(this);
+        return UI.CreateFontSizeSelector(this.UIContainer, this.boundHandleFontSizeOptionsChange);
+    }
+
+    HandlePageSelectionChange() {
         if (document.activeElement === this.Page) {
             this.ClearTargetSelections();
             this.RebuildTargetSelections();
@@ -316,26 +322,17 @@ export class TextEditorObject {
         //console.log('Focus Out');
         this.ClearTargetSelections();
     }
-    HandlePageMouseUp() {
-        //console.log('Mouse Up');
-        //this.ClearTargetSelections();
-    }
-    HandlePageMouseDown() {
-        //this.ClearTargetSelections();
-    }
-    HandlePageInputEvent(events) {
-        //this.Selection_KeyInput(events);
-    }	
+
     HandlePageDragStart(event) {
         //console.log('start drag');
         event.preventDefault();
         event.stopPropagation();
-    }	
+    }
     HandlePageDragDrop(event) {
         //console.log(event);
         event.preventDefault();
         event.stopPropagation();
-    }	
+    }
     HandlePagePasteText(event) {
         event.preventDefault();
         let plaintext = event.clipboardData.getData('text/plain');
@@ -345,7 +342,7 @@ export class TextEditorObject {
 
         let offset = range.startOffset + plaintext.length;
         if (event.target.tagName === Void.Break) {
-            let text = document.createTextNode(plaintext);          
+            let text = document.createTextNode(plaintext);
             event.target.parentNode.prepend(text);
             event.target.remove();
         }
@@ -353,12 +350,10 @@ export class TextEditorObject {
             let textarea = event.target;
             const textBefore = textarea.textContent.substring(0, range.startOffset);
             const textAfter = textarea.textContent.substring(range.endOffset);
-            textarea.textContent = textBefore + plaintext + textAfter;           
+            textarea.textContent = textBefore + plaintext + textAfter;
         }
-        selection.setPosition(this.GetTreeNode(this.RangeTree_Start), offset);
+        selection.setPosition(this.GetTailofTree(this.RangeTree_Start), offset);
     }
-
-
 
     HandleStyleButtonClick(tag) {
         this.ToggleTreeTag(tag);
@@ -366,81 +361,84 @@ export class TextEditorObject {
     HandleBlockStyleClick(tag) {
         this.ToggleBlockTag(tag);
     }
-	HandleStandardBlockIndentClick(style){
-		this.ToggleStandardBlock_TextIndent(style);
-	}
+    HandleLinkButtonClick(behavior) {
+        this.ToggleLink(behavior);
+    }
+    HandleStandardBlockIndentClick(style) {
+        this.ToggleStandardBlock_TextIndent(style);
+    }
     HandleStandardBlockTextAlignClick(style) {
 
-		this.ToggleStandardBlock_TextAlignment(style);
+        this.ToggleStandardBlock_TextAlignment(style);
     }
     HandleStandardBlockOptionsChange(event) {
-        if (event.isTrusted) {			
+        if (event.isTrusted) {
             this.ChangeBlockType(this.StandardBlockSelector.value);
         }
     }
-	HandleTextColorOptionChange(event){
-		if(event.isTrusted) {
-			if(this.ColorSelector.value !== 'none'){				
-				if(this.ColorSelector.value === ExtraOptionStart.Value)
-					this.ToggleTreeStyle(this.RangeTree_Start.style.color, StyleType.Color);
-				else if(this.ColorSelector.value === ExtraOptionEnd.Value)
-					this.ToggleTreeStyle(this.RangeTree_End.style.color, StyleType.Color);
-				else
-					this.ToggleTreeStyle(this.ColorSelector.value, StyleType.Color);
-			}
-		}
-	}
-	HandleBackgroundColorOptionsChange(event){
-		if(event.isTrusted){
-			if(this.BackgroundColorSelector.value !== 'none') {
-				if(this.BackgroundColorSelector.value === ExtraOptionStart.Value)
-					this.ToggleTreeStyle(this.RangeTree_Start.style.backgroundColor, StyleType.BackgroundColor);
-				else if(this.BackgroundColorSelector.value === ExtraOptionEnd.Value)
-					this.ToggleTreeStyle(this.RangeTree_End.style.backgroundColor, StyleType.BackgroundColor);
-				else
-					this.ToggleTreeStyle(this.BackgroundColorSelector.value, StyleType.BackgroundColor);
-			}
-		}
-	}
-	HandleFontSizeOptionsChange(event){
-		if(event.isTrusted){
-			if(this.FontSizeSelector.value !== 'none'){
-				if(this.FontSizeSelector.value === ExtraOptionStart.Value)
-					this.ToggleTreeStyle(this.RangeTree_Start.style.fontSize, StyleType.FontSize);
-				else if(this.FontSizeSelector.value === ExtraOptionEnd.Value)
-					this.ToggleTreeStyle(this.RangeTree_End.style.fontSize, StyleType.FontSize);
-				else
-					this.ToggleTreeStyle(this.FontSizeSelector.value, StyleType.FontSize);
-			}
-		}
-	}
-	HandleFontFamilyOptionsChange(event) {
-		if(event.isTrusted) {
-			if(this.FontFamilySelector.value !== 'none') {
-				if(this.FontFamilySelector.value === ExtraOptionStart.Value)
-					this.ToggleTreeStyle(this.RangeTree_Start.style.fontFamily, StyleType.FontFamily);
-				else if(this.FontFamilySelector.value === ExtraOptionEnd.Value)
-					this.ToggleTreeStyle(this.RangeTree_End.style.fontFamily, StyleType.FontFamily);
-				else
-					this.ToggleTreeStyle(this.FontFamilySelector.value, StyleType.FontFamily)
-			}
-		}
-	}	
-	
-    PrintTargets() {
-        this.Selection_LazySelector_Word();
-		console.log(this.StartBlock);
-		console.log(this.EndBlock);
-		console.log(document.getSelection().getRangeAt(0));
+    HandleTextColorOptionChange(event) {
+        if (event.isTrusted) {
+            if (this.ColorSelector.value !== 'none') {
+                if (this.ColorSelector.value === ExtraOptionStart.Value)
+                    this.ToggleTreeStyle(this.RangeTree_Start.style.color, StyleType.Color);
+                else if (this.ColorSelector.value === ExtraOptionEnd.Value)
+                    this.ToggleTreeStyle(this.RangeTree_End.style.color, StyleType.Color);
+                else
+                    this.ToggleTreeStyle(this.ColorSelector.value, StyleType.Color);
+            }
+        }
+    }
+    HandleBackgroundColorOptionsChange(event) {
+        if (event.isTrusted) {
+            if (this.BackgroundColorSelector.value !== 'none') {
+                if (this.BackgroundColorSelector.value === ExtraOptionStart.Value)
+                    this.ToggleTreeStyle(this.RangeTree_Start.style.backgroundColor, StyleType.BackgroundColor);
+                else if (this.BackgroundColorSelector.value === ExtraOptionEnd.Value)
+                    this.ToggleTreeStyle(this.RangeTree_End.style.backgroundColor, StyleType.BackgroundColor);
+                else
+                    this.ToggleTreeStyle(this.BackgroundColorSelector.value, StyleType.BackgroundColor);
+            }
+        }
+    }
+    HandleFontSizeOptionsChange(event) {
+        if (event.isTrusted) {
+            if (this.FontSizeSelector.value !== 'none') {
+                if (this.FontSizeSelector.value === ExtraOptionStart.Value)
+                    this.ToggleTreeStyle(this.RangeTree_Start.style.fontSize, StyleType.FontSize);
+                else if (this.FontSizeSelector.value === ExtraOptionEnd.Value)
+                    this.ToggleTreeStyle(this.RangeTree_End.style.fontSize, StyleType.FontSize);
+                else
+                    this.ToggleTreeStyle(this.FontSizeSelector.value, StyleType.FontSize);
+            }
+        }
+    }
+    HandleFontFamilyOptionsChange(event) {
+        if (event.isTrusted) {
+            if (this.FontFamilySelector.value !== 'none') {
+                if (this.FontFamilySelector.value === ExtraOptionStart.Value)
+                    this.ToggleTreeStyle(this.RangeTree_Start.style.fontFamily, StyleType.FontFamily);
+                else if (this.FontFamilySelector.value === ExtraOptionEnd.Value)
+                    this.ToggleTreeStyle(this.RangeTree_End.style.fontFamily, StyleType.FontFamily);
+                else
+                    this.ToggleTreeStyle(this.FontFamilySelector.value, StyleType.FontFamily)
+            }
+        }
     }
 
+    //PrintTargets() {
+    //    //this.Selection_LazySelector_Word();
+    //    console.log(this.StartBlock);
+    //    console.log(this.EndBlock);
+    //    console.log(document.getSelection().getRangeAt(0));
+    //}
+
     KeyBoardPageEvents(event) {
-        if (event.keyCode === 192) { //temporary Testing Code ` tilda key
-            event.preventDefault();
-            event.stopPropagation();
-            this.PrintTargets();
-        }
-        else if (event.code === 'Enter') {
+        //if (event.keyCode === 192) { //temporary Testing Code ` tilda key
+        //    event.preventDefault();
+        //    event.stopPropagation();
+        //    this.PrintTargets();
+        //}
+        if (event.code === 'Enter') {
             event.preventDefault();
             event.stopPropagation();
             let selection = document.getSelection();
@@ -498,7 +496,6 @@ export class TextEditorObject {
 
             }
             else { //Selection Type is Caret
-
                 if (this.Block_is_Standard_Structure(this.StartBlock)) {
                     rangeclone = this.Block_Standard_Behavior_BackspaceKey(event);
                 }
@@ -510,7 +507,6 @@ export class TextEditorObject {
                 }
             }
         }
-
         else if (event.code === 'Delete') {
             let selection = document.getSelection();
             let rangeclone = selection.getRangeAt(0).cloneRange();
@@ -554,17 +550,15 @@ export class TextEditorObject {
     }
 
     //Merges previous Blocks if its the same type or sets the caret to the end of the previous block
-    BackSpace_BlockBehavior(previousBlock) {
+    Delete_BKWD_BlockBehavior(previous) { //BackSpace_BlockBehavior
         let range = document.createRange();
         //Turn into Function
-        if (previousBlock.tagName === this.StartBlock.tagName) {
-            //let lasttree = this.GetLastTreeNode(previousBlock);
-            range.selectNodeContents(previousBlock);
+        if (previous.block.tagName === this.StartBlock.tagName) {
+            range.selectNodeContents(previous.block);
             this.StartBlock.prepend(range.extractContents());
-            this.Page.removeChild(previousBlock);
+            this.Page.removeChild(previous.block);
             let length = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
-            let tempTextNode = this.GetLastNode(this.RangeTree_Start);
-
+            let tempTextNode = this.GetTailofTree(this.RangeTree_Start);
             if (tempTextNode.nodeType === Node.TEXT_NODE) {
                 range.setStart(tempTextNode, length);
                 range.setEnd(tempTextNode, length);
@@ -575,15 +569,14 @@ export class TextEditorObject {
             }
         }
         else {
-            let previousLast = this.GetLastNode(previousBlock);
-
-            if (previousLast.tagName === Void.Break) {
-                range.setStart(previousLast.parentNode, previousLast.parentNode.childNodes.length - 1);
-                range.setEnd(previousLast.parentNode, previousLast.parentNode.childNodes.length - 1);
+            let treeTail = this.GetTailofTree(previous.tree);
+            if (treeTail.tagName === Void.Break) {
+                range.setStart(treeTail.parentNode, treeTail.parentNode.childNodes.length - 1);
+                range.setEnd(treeTail.parentNode, treeTail.parentNode.childNodes.length - 1);
             }
             else {
-                range.setStart(previousLast, previousLast.textContent.length);
-                range.setEnd(previousLast, previousLast.textContent.length);
+                range.setStart(treeTail, treeTail.textContent.length);
+                range.setEnd(treeTail, treeTail.textContent.length);
             }
             //Deletes
             if (this.StartBlock.textContent.length === 0) {
@@ -593,130 +586,124 @@ export class TextEditorObject {
 
         return range;
     }
-
     //Merges Next Block if its the same type or sets the caret to the start of the next block
-    Delete_BlockBehavior(nextBlock) { //Delete_BlockBehavior
+    Delete_FWD_NextBlockBehavior(next) { //Delete_BlockBehavior
         let rangeclone = document.createRange();
-        if (nextBlock.tagName === this.StartBlock.tagName) {
-            rangeclone.selectNodeContents(nextBlock);
+        if (next.block.tagName === this.StartBlock.tagName) {
+            rangeclone.selectNodeContents(next.block);
             let fragment = rangeclone.extractContents();
             this.StartBlock.append(fragment);
-            this.Page.removeChild(nextBlock);
+            this.Page.removeChild(next.block);
             let length = this.RangeTree_Start.textContent.length;
             this.Core_MergeIdenticalTrees(this.RangeTree_Start);
-            let savenode = this.GetLastNode(this.RangeTree_Start);
 
-            if (savenode.nodeType === Node.TEXT_NODE) {
-                rangeclone.setStart(savenode, length);
-                rangeclone.setEnd(savenode, length);
+            let treeTail = this.GetTailofTree(this.RangeTree_Start);
+            if (treeTail.nodeType === Node.TEXT_NODE) {
+                rangeclone.setStart(treeTail, length);
+                rangeclone.setEnd(treeTail, length);
             }
             else {
-                rangeclone.setStart(savenode.parentNode, 0);
-                rangeclone.setEnd(savenode.parentNode, 0);
+                rangeclone.setStart(treeTail.parentNode, 0);
+                rangeclone.setEnd(treeTail.parentNode, 0);
             }
         }
         else {
-            if (nextBlock.textContent.length === 0 && nextBlock.childNodes.length <= 1) {
-                this.Page.removeChild(nextBlock);
+            if (next.block.textContent.length === 0 && next.block.childNodes.length <= 1) {
+                this.Page.removeChild(next.block);
             }
             else {
-                let nextFirst = this.GetFirstNode(nextBlock);
-
-                if (nextFirst.tagName === Void.Break) {
-                    rangeclone.setStart(nextFirst.parentNode, nextFirst.parentNode.childNodes.length - 1);
-                    rangeclone.setEnd(nextFirst.parentNode, nextFirst.parentNode.childNodes.length - 1);
+                let treeTail = this.GetTailofTree(next.tree);
+                if (treeTail.tagName === Void.Break) {
+                    rangeclone.setStart(treeTail.parentNode, nextFirst.parentNode.childNodes.length - 1);
+                    rangeclone.setEnd(treeTail.parentNode, nextFirst.parentNode.childNodes.length - 1);
                 }
                 else {
-                    rangeclone.setStart(nextFirst, 0);
-                    rangeclone.setEnd(nextFirst, 0);
+                    rangeclone.setStart(treeTail, 0);
+                    rangeclone.setEnd(treeTail, 0);
                 }
             }
         }
+
         return rangeclone;
     }
-	
-	//Deletes the selected Range and returns 
+    //Deletes the selected Range and returns 
     Selection_Delete() {
         let resultRange = document.getSelection().getRangeAt(0);
 
-		//Range Delete Solution Divides Blocks, deletes every block between the new outer blocks
-        let outerend = this.EndBlock.nextSibling;
+        //Range Delete Solution Divides Blocks, deletes every block between the new outer blocks
         if (this.atContainerEnd(this.EndBlock, resultRange) === false) {
-			//Extra Check to prevent division of container with 2 or less BR tags, subsequent traversal code will clean up EndBlock
-			if(this.EndBlock.textContent.length !== 0 && this.EndBlock.childNodes.length <= 2){
-				this.Core_DivideContainer_New_End(this.EndBlock, this.EndBlock.tagName);
-				outerend = this.EndBlock.nextSibling;
-			}
+            //Extra Check to prevent division of container with 2 or less BR tags, subsequent traversal code will clean up EndBlock
+            if (this.EndBlock.textContent.length !== 0 || this.EndBlock.childNodes.length > 2) {
+                this.Core_DivideContainer_New_End(this.EndBlock, this.EndBlock.tagName);
+            }
         }
+        let outerend = this.Block_Traversal_Iterate_To_Next(this.EndBlock, this.RangeTree_End);
 
         if (this.atContainerStart(this.StartBlock, resultRange) === false) {
             this.Core_DivideContainer_New_Front(this.StartBlock, this.StartBlock.tagName);
         }
         else {
-            if (this.StartBlock.previousSibling === null) {
+            if (Iterate_Sibling_Previous(this.StartBlock) === null) {
                 let block = this.CreateNewBlock();
                 this.StartBlock.insertAdjacentElement('beforebegin', block);
             }
         }
-        let outerstart = this.StartBlock.previousSibling;
+        let outerstart = this.Block_Traversal_Iterate_To_Previous(this.StartBlock, this.RangeTree_Start);
 
         //Delete The Sandwiched Blocks
         let iter = this.StartBlock;
         while (iter !== this.EndBlock) {
             let temp = iter;
-            iter = iter.nextSibling;
+            iter = Iterate_Sibling_Next(iter);
             temp.parentNode.removeChild(temp);
         }
         this.EndBlock.remove();
-		
-		//Merge and/or Set the Range
-        let lastTree = this.GetLastTreeNode(outerstart);
-        if (outerend !== null) {
-            let firstTree = this.GetFirstTreeNode(outerend);
-			
-            if (outerstart.tagName === outerend.tagName) { //Merge Blocks if same
-                resultRange.selectNodeContents(outerend);
-                outerstart.append(resultRange.extractContents());
-                this.Page.removeChild(outerend);
-				
-                let length = this.Core_MergeIdenticalTree_Previous(firstTree);
-				
-                let newend = this.GetTreeNode(firstTree);
-                if (newend.nodeType === Node.TEXT_NODE) {
-                    resultRange.setStart(newend, length);
-                    resultRange.setEnd(newend, length);
+        //Merge and/or Set the Range
+        if (outerend.block !== null) {
+
+            if (outerstart.block.tagName === outerend.block.tagName) { //Merge Blocks if same
+                resultRange.selectNodeContents(outerend.block);
+                outerstart.block.append(resultRange.extractContents());
+                this.Page.removeChild(outerend.block);
+
+                let length = this.Core_MergeIdenticalTree_Previous(outerend.tree);
+                let tail = this.GetTailofTree(outerend.tree);
+                if (tail.nodeType === Node.TEXT_NODE) {
+                    resultRange.setStart(tail, length);
+                    resultRange.setEnd(tail, length);
                 }
                 else {
-                    resultRange.setStart(newend.parentNode, newend.parentNode.childNodes.length - 1);
-                    resultRange.setEnd(newend.parentNode, newend.parentNode.childNodes.length - 1);
+                    resultRange.setStart(tail.parentNode, tail.parentNode.childNodes.length - 1);
+                    resultRange.setEnd(tail.parentNode, tail.parentNode.childNodes.length - 1);
                 }
             }
             else {
-                let newfront = this.GetTreeNode(lastTree);
-                if (newfront.nodeType === Node.TEXT_NODE) {
-                    resultRange.setStart(newfront, newfront.textContent.length);
+                let startTail = this.GetTailofTree(outerstart.tree);
+                if (startTail.nodeType === Node.TEXT_NODE) {
+                    resultRange.setStart(startTail, startTail.textContent.length);
                 }
                 else {
-                    resultRange.setStart(newfront.parentNode, newfront.parentNode.childNodes.length - 1);
+                    resultRange.setStart(startTail.parentNode, startTail.parentNode.childNodes.length - 1);
                 }
-                let newend = this.GetTreeNode(firstTree);
-                if (newend.nodeType === Node.TEXT_NODE) {
-                    resultRange.setEnd(newend, 0);
+
+                let endTail = this.GetTailofTree(outerend.tree);
+                if (endTail === Node.TEXT_NODE) {
+                    resultRange.setEnd(endTail, 0);
                 }
                 else {
-                    resultRange.setEnd(newend.parentNode, newend.parentNode.childNodes.length - 1);
+                    resultRange.setEnd(endTail.parentNode, outerend.tree.parentNode.childNodes.length - 1);
                 }
             }
         }
         else {
-            let node = this.GetTreeNode(lastTree);
-            if (node.nodeType === Node.TEXT_NODE) {
-                resultRange.setStart(node, node.textContent.length);
-                resultRange.setEnd(node, node.textContent.length);
+            let tail = this.GetTailofTree(outerstart.tree);
+            if (tail.nodeType === Node.TEXT_NODE) {
+                resultRange.setStart(tail, tail.textContent.length);
+                resultRange.setEnd(tail, tail.textContent.length);
             }
             else {
-                resultRange.setStart(node.parentNode, node.parentNode.childNodes.length - 1);
-                resultRange.setEnd(node.parentNode, node.parentNode.childNodes.length - 1);
+                resultRange.setStart(tail.parentNode, tail.parentNode.childNodes.length - 1);
+                resultRange.setEnd(tail.parentNode, tail.parentNode.childNodes.length - 1);
             }
         }
         return resultRange;
@@ -735,23 +722,18 @@ export class TextEditorObject {
         return texttree;
     }
     CreateNewListItem() {
-        const element = document.createElement('li');
+        const element = document.createElement(ListStructures.ListItem);
         element.appendChild(this.CreateNewTextTree());
         return element;
     }
 
-    isWhiteSpace(node) {
-        return !/[^\t\n\r ]/.test(node.textContent);
-    }
-
     isEmptyTag(node) {
         let isEmpty = false;
-
         if (node.textContent === "") {
             isEmpty = true;
         }
         else {
-            node = this.GetTreeNode(node);
+            node = this.GetTailofTree(node);
             if (node.nodeType !== Node.TEXT_NODE) {
                 if (node.tagName !== Void.Break) {
                     isEmpty = true;
@@ -761,25 +743,15 @@ export class TextEditorObject {
         return isEmpty;
     }
 
-    GetNextBlock(BlockNode) {
-        BlockNode = BlockNode.nextSibling;
-        return BlockNode;
-    }
-
-    GetPreviousBlock(BlockNode) {
-        BlockNode = BlockNode.previousSibling;
-        return BlockNode;
-    }
-
-
     Core_MergeIdenticalTrees(treeNode) {
         let length = 0;
-        if (treeNode.nextSibling !== null) {
-            if (treeNode.nextSibling.textContent.length !== 0) {
-                if (this.Core_hasIdentical_Tags(treeNode, treeNode.nextSibling) === true &&
-					this.Core_hasIdenticalStyle(treeNode, treeNode.nextSibling) === true) {
-                    this.GetTreeNode(treeNode).textContent += treeNode.nextSibling.textContent;
-                    treeNode.nextSibling.remove();
+        let next = Iterate_Sibling_Next(treeNode);
+        if (next !== null) {
+            if (next.textContent.length !== 0) {
+                if (this.Core_hasIdentical_Tags(treeNode, next) === true &&
+                    this.Core_hasIdenticalStyle(treeNode, next) === true) {
+                    this.GetTailofTree(treeNode).textContent += next.textContent;
+                    next.remove();
                 }
             }
         }
@@ -789,30 +761,29 @@ export class TextEditorObject {
 
 
     Core_MergeIdenticalTree_Previous(treeNode) {
-        //let length = treeNode.textContent.length;
-
         let length = 0;
-        if (treeNode.previousSibling !== null) {
-            if (treeNode.previousSibling.textContent.length !== 0) {
-                if (this.Core_hasIdentical_Tags(treeNode, treeNode.previousSibling) === true &&
-					this.Core_hasIdenticalStyle(treeNode, treeNode.previousSibling) === true){
-                    
-					//This stops some kind of edge that was causing an issue setting the range
-                    if (treeNode.previousSibling === this.RangeTree_Start) {
+        let previous = Iterate_Sibling_Previous(treeNode);
+        if (previous !== null) {
+            if (previous.textContent.length !== 0) {
+                if (this.Core_hasIdentical_Tags(treeNode, previous) === true &&
+                    this.Core_hasIdenticalStyle(treeNode, previous) === true) {
+
+                    //This stops some kind of edge that was causing an issue setting the range
+                    if (previous === this.RangeTree_Start) {
                         this.RangeTree_Start = treeNode;
                     }
-                    let textNode = this.GetTreeNode(treeNode);
-                    length = treeNode.previousSibling.textContent.length;
+                    let textNode = this.GetTailofTree(treeNode);
+                    length = previous.textContent.length;
 
-                    textNode.textContent = treeNode.previousSibling.textContent + textNode.textContent;
-                    treeNode.previousSibling.remove();
+                    textNode.textContent = previous.textContent + textNode.textContent;
+                    previous.remove();
                     treeNode = null;
                 }
             }
         }
         return length;
     }
-	
+
     Core_hasIdentical_Tags(anchorTreeNode, siblingTreeNode) {
         let isEqual = true;
 
@@ -851,25 +822,32 @@ export class TextEditorObject {
         }
         return test;
     }
-	
-	Core_hasIdenticalStyle(treenode, siblingtree) {
-		let samestyles = true;
-		if(treenode.style.color != siblingtree.style.color)
-			samestyles = false;
-		if(treenode.style.fontFamily != siblingtree.style.fontFamily)
-			samestyles = false;
-		if(treenode.style.backgroundColor != siblingtree.style.backgroundColor)
-			samestyles = false;
-		if(treenode.style.fontSize != siblingtree.style.fontSize)
-			samestyles = false;
-		
-		return samestyles;
-	}
-	
+
+    Core_hasIdenticalStyle(treenode, siblingtree) {
+        let samestyles = true;
+        if (treenode.style.color != siblingtree.style.color)
+            samestyles = false;
+        if (treenode.style.fontFamily != siblingtree.style.fontFamily)
+            samestyles = false;
+        if (treenode.style.backgroundColor != siblingtree.style.backgroundColor)
+            samestyles = false;
+        if (treenode.style.fontSize != siblingtree.style.fontSize)
+            samestyles = false;
+
+        return samestyles;
+    }
+
+    GetTailofTree(treeNode) {
+        while (treeNode.firstChild !== null) {
+            treeNode = treeNode.firstChild;
+        }
+        return treeNode;
+    }
 
     atContainerStart(container, range) {
         let atStart = false;
         let startNode = this.GetFirstNode(container);
+
         if (range.startOffset === 0) {
             if (startNode === range.startContainer) {
                 atStart = true;
@@ -899,29 +877,6 @@ export class TextEditorObject {
         return atEnd;
     }
 
-    //TODO: Clean Up these GetNode Functions
-    GetTreeNode(containerNode) {
-
-        while (containerNode.firstChild !== null) {
-            containerNode = containerNode.firstChild;
-        }
-        return containerNode;
-    }
-
-    GetFirstTreeNode(BlockContainer) {
-        while (BlockContainer.tagName !== Const.Tree) { //Change null checked BlockContainer
-            BlockContainer = BlockContainer.firstChild;
-        }
-        return BlockContainer;
-    }
-
-    GetLastTreeNode(BlockContainer) {
-        while (BlockContainer.tagName !== Const.Tree) {
-            BlockContainer = BlockContainer.lastChild;
-        }
-        return BlockContainer;
-    }
-
     GetFirstNode(containerToSearch) {
         let result = null
         while (result === null) {
@@ -934,7 +889,7 @@ export class TextEditorObject {
                     result = containerToSearch;
                 }
                 else {
-                    containerToSearch = containerToSearch.firstChild;
+                    containerToSearch = Iterate_FirstChild(containerToSearch);
                 }
             }
 
@@ -953,13 +908,15 @@ export class TextEditorObject {
                     result = containerToSearch;
                 }
                 else {
-                    containerToSearch = containerToSearch.lastChild;
+                    containerToSearch = Iterate_LastChild(containerToSearch);
                 }
             }
         }
 
         return result;
     }
+
+
 
     ToggleBlockTag(blocktag) {
 
@@ -986,12 +943,15 @@ export class TextEditorObject {
         tempRange.setStart(range.endContainer, range.endOffset);
         tempRange.deleteContents();
         tempRange.detach();
-        //Potential Edge Case for Empty Tags Caused by deleteContents Function	
-		if(this.isEmptyTag(container.lastChild)){
-			container.removeChild(container.lastChild);			
-		}
-		//copy Styles - won't worry if its been kicked out of the dom tree
-		return backhalf;
+        //Potential Edge Case for Empty Tags Caused by deleteContents Function
+        let lastchild = Iterate_LastChild(container);
+        if (this.isEmptyTag(lastchild)) {
+            container.removeChild(lastchild);
+        }
+        //copy Styles - won't worry if its been kicked out of the dom tree
+        this.CopyContainerStyles(container, backhalf);
+
+        return backhalf;
     }
 
     Core_DivideContainer_New_Front(container, TagString) {
@@ -1008,10 +968,11 @@ export class TextEditorObject {
         if (this.isEmptyTag(container.firstChild)) {
             container.firstChild.remove();
         }
-		//Copy Styles
-		return fronthalf;
+        //Copy Styles
+        this.CopyContainerStyles(container, fronthalf);
+        return fronthalf;
     }
-	
+
     Core_ImplementTag_Tree(container, tag, behavior) {
         if (container.textContent.length !== 0) {
             let styledelement = container.querySelector(tag);
@@ -1025,17 +986,14 @@ export class TextEditorObject {
             }
 
             if (styledelement !== null && (behavior === Behavior.Remove || behavior === Behavior.Toggle)) {
-                styledelement.parentNode.replaceChild(styledelement.firstChild, styledelement);
-                //let inner = styledelement.innerHTML;                
-                //styledelement.insertAdjacentHTML('afterend', inner);
-                //styledelement.remove();
+                styledelement.parentNode.replaceChild(Iterate_FirstChild(styledelement), styledelement);
             }
         }
     }
 
     Core_Set_Range_Selection(startoffset, endoffset) {
         let selectionRange = document.createRange();
-        let start = this.GetTreeNode(this.RangeTree_Start);
+        let start = this.GetTailofTree(this.RangeTree_Start);
         if (start.nodeType === Node.TEXT_NODE) {
             selectionRange.setStart(start, startoffset);
         }
@@ -1043,7 +1001,7 @@ export class TextEditorObject {
             selectionRange.setStart(start.parentNode, 0);
         }
 
-        let end = this.GetTreeNode(this.RangeTree_End);
+        let end = this.GetTailofTree(this.RangeTree_End);
         if (end.nodeType === Node.TEXT_NODE) {
             selectionRange.setEnd(end, endoffset);
         }
@@ -1064,19 +1022,57 @@ export class TextEditorObject {
         return isListBlock;
     }
 
-    Block_Traversal_Find_First_Tree_In_NextBlock(block, lastTree) {
+    Block_Traversal_Iterate_To_Next(block, lastTree) {
         let iter = { block, tree: null };
 
         if (this.Block_is_Standard_Structure(iter.block)) {
-            iter = this.Block_Standard_Traversal_SubRoutine(iter.block);
+            iter = this.Block_Standard_FWD_Traversal_SubRoutine(iter.block);
         }
         else {
             if (this.Block_is_List_Structure(iter.block)) {
-                iter = this.Block_List_Traversal_SubRoutine(iter.block, lastTree.parentNode);
+                iter = this.Block_List_FWD_Traversal_SubRoutine(iter.block, lastTree.parentNode);
             }
         }
-
         return iter;
+    }
+
+    Block_Traversal_Iterate_To_Previous(block, lastTree) {
+        let iter = { block, tree: null };
+        if (this.Block_is_Standard_Structure(iter.block)) {
+            iter = this.Block_Standard_BKWD_Traversal_SubRoutine(iter.block);
+        }
+        else {
+            if (this.Block_is_List_Structure(iter.block)) {
+                iter = this.Block_List_BKWD_Traversal_SubRoutine(iter.block, lastTree.parentNode);
+            }
+        }
+        return iter;
+    }
+
+    Block_Traverse_GetFirstTree(block) {
+        let tree = null;
+        if (this.Block_is_Standard_Structure(block)) {
+            tree = this.Block_Standard_GetFirstTree(block)
+        }
+        else {
+            if (this.Block_is_List_Structure(block)) {
+                tree = this.Block_List_GetFirstTree(block);
+            }
+        }
+        return tree;
+    }
+
+    Block_Traverse_GetLastTree(block) {
+        let tree = null;
+        if (this.Block_is_Standard_Structure(block)) {
+            tree = this.Block_Standard_GetLastTree(block);
+        }
+        else {
+            if (this.Block_is_List_Structure(block)) {
+                tree = this.Block_List_GetLastTree(block);
+            }
+        }
+        return tree;
     }
 
     Core_DetermineStyleBehavior(tag) {
@@ -1096,7 +1092,7 @@ export class TextEditorObject {
         //Only remove if the counts are equal - Break out as soon as a tag is not found in a tree
         while (iter.tree !== this.RangeTree_End && treecount === stylecount) {
             if (iter.tree === null) {//Increment the tempiter
-                iter = this.Block_Traversal_Find_First_Tree_In_NextBlock(iter.block, lastiter);
+                iter = this.Block_Traversal_Iterate_To_Next(iter.block, lastiter);
             }
             else {
                 // Checking length will ignore trees with BR tags, but will unsync the count logic to determine the behavior
@@ -1107,10 +1103,9 @@ export class TextEditorObject {
                     }
                 }
                 lastiter = iter.tree;
-                iter.tree = iter.tree.nextSibling;
+                iter.tree = Iterate_Sibling_Next(iter.tree);
             }
         }
-
 
         if (treecount === stylecount) {
             behavior = Behavior.Remove;
@@ -1123,51 +1118,51 @@ export class TextEditorObject {
     //If Caret is outside of the word, it will do nothing.
     Selection_LazySelector_Word() {
         // Lazy Select Toggle - Create a class boolean to enable user to toggle this feature on and off.
-		if(true){
-			let selection = document.getSelection();
-			let originalrange = selection.getRangeAt(0).cloneRange();
+        if (true) {
+            let selection = document.getSelection();
+            let originalrange = selection.getRangeAt(0).cloneRange();
 
-			let offset = originalrange.startOffset;
+            let offset = originalrange.startOffset;
 
-			selection.modify('move', 'forward', 'word');
-			selection.modify('extend', 'backward', 'word');
-			let newrange = selection.getRangeAt(0);
-			let wordlength = selection.toString().trim().length;
-			let wordStart = this.FindTargetStartTree(newrange.startContainer);
+            selection.modify('move', 'forward', 'word');
+            selection.modify('extend', 'backward', 'word');
+            let newrange = selection.getRangeAt(0);
+            let wordlength = selection.toString().trim().length;
+            let wordStart = this.FindTargetTree(this.StartBlock, newrange.startContainer); //this.FindTargetStartTree(newrange.startContainer);
 
-			offset -= newrange.startOffset;
-			let counter = 0;
-			while (this.RangeTree_Start !== wordStart) {
-            counter += wordStart.textContent.length;
-            wordStart = wordStart.nextSibling;
-			}
-			offset += counter;
+            offset -= newrange.startOffset;
+            let counter = 0;
+            while (this.RangeTree_Start !== wordStart) {
+                counter += wordStart.textContent.length;
+                wordStart = wordStart.nextSibling;
+            }
+            offset += counter;
 
 
-			if (offset <= 0 || offset >= wordlength) {
-				selection.setPosition(originalrange.startContainer, originalrange.startOffset);
-			}
-			else {
-				let tree = this.FindTargetStartTree(newrange.startContainer);
-				let counter = -newrange.startOffset;
-				while (counter < wordlength) {
-					if (counter + tree.textContent.length < wordlength) {
-						counter += tree.textContent.length;
-						tree = tree.nextSibling;
-					}
-					else {
-                    offset = wordlength - counter;
-                    counter = wordlength;
-					}
-				}
-				selection.setBaseAndExtent(newrange.startContainer, newrange.startOffset, this.GetTreeNode(tree), offset);
-			}
-			originalrange.detach();
-			newrange.detach();
-			
-			this.RebuildTargetSelections();
-		}
-       
+            if (offset <= 0 || offset >= wordlength) {
+                selection.setPosition(originalrange.startContainer, originalrange.startOffset);
+            }
+            else {
+                let tree = this.FindTargetTree(this.StartBlock, newrange.startContainer); //this.FindTargetStartTree(newrange.startContainer);
+                let counter = -newrange.startOffset;
+                while (counter < wordlength) {
+                    if (counter + tree.textContent.length < wordlength) {
+                        counter += tree.textContent.length;
+                        tree = this.Iterate_Tree_Next(tree);
+                    }
+                    else {
+                        offset = wordlength - counter;
+                        counter = wordlength;
+                    }
+                }
+                selection.setBaseAndExtent(newrange.startContainer, newrange.startOffset, this.GetTailofTree(tree), offset);
+            }
+            originalrange.detach();
+            newrange.detach();
+
+            this.RebuildTargetSelections();
+        }
+
     }
 
     ChangeBlockType(blocktag) {
@@ -1180,100 +1175,99 @@ export class TextEditorObject {
                 this.Page.replaceChild(newBlock, this.StartBlock);
                 range.detach();
 
-                let node = this.GetTreeNode(newBlock);
-                if (node.nodeType === Node.TEXT_NODE) {                   
+                let node = this.GetTailofTree(newBlock);
+                if (node.nodeType === Node.TEXT_NODE) {
                     document.getSelection().setPosition(node, 0);
                 }
                 else {
                     document.getSelection().setPosition(node.parentNode, 0);
                 }
-             
+
             }
         }
 
     }
-	
-	ToggleStandardBlock_TextIndent(style){
-		if (this.Block_is_Standard_Structure(this.StartBlock) === true) {   
-			if(style === StandardBlockStyles_textindent.indent) {
-				this.StartBlock.style.textIndent = '25px';
-			}
-			else{
-				this.StartBlock.style.textIndent = "";
-			}
-		}
 
-	}
+    ToggleStandardBlock_TextIndent(style) {
+        if (this.Block_is_Standard_Structure(this.StartBlock) === true) {
+            if (style === StandardBlockStyles_textindent.indent) {
+                this.StartBlock.style.textIndent = '25px';
+            }
+            else {
+                this.StartBlock.style.textIndent = "";
+            }
+        }
+    }
 
     ToggleStandardBlock_TextAlignment(style) {
-		let range = document.getSelection().getRangeAt(0).cloneRange();
-        if (this.Block_is_Standard_Structure(this.StartBlock) === true) {          
-           if(style === StandardBlockStyles_textalign.left){
-				this.StartBlock.style.textAlign = '';
-		   }
-		   else{
-			   this.StartBlock.style.textAlign = style;
-		   }
-                      
+        let range = document.getSelection().getRangeAt(0).cloneRange();
+        if (this.Block_is_Standard_Structure(this.StartBlock) === true) {
+            if (style === StandardBlockStyles_textalign.left) {
+                this.StartBlock.style.textAlign = '';
+            }
+            else {
+                this.StartBlock.style.textAlign = style;
+            }
+
         }
-		//setBaseAndExtent function is unable to unselect a html selector
-		document.getSelection().removeAllRanges();
+        //setBaseAndExtent function is unable to unselect a html selector
+        document.getSelection().removeAllRanges();
         document.getSelection().addRange(range);
 
     }
-	
-	CopyContainerStyles(anchorTree, newTree){
-		if(newTree.textContent.length !== 0){
-			newTree.style.color = anchorTree.style.color;
-			newTree.style.fontFamily = anchorTree.style.fontFamily;
-			newTree.style.backgroundColor = anchorTree.style.backgroundColor;			
-			newTree.style.fontSize = anchorTree.style.fontSize;
-		}
-	}
-	
-	ApplyNewStyle(targetContainer, style, styleType){
-		if(styleType == StyleType.Color)
-			targetContainer.style.color = style;
-		else if(styleType == StyleType.FontFamily) 
-			targetContainer.style.fontFamily = style;		
-		else if(styleType == StyleType.BackgroundColor)
-			targetContainer.style.backgroundColor = style;
-		else if(styleType == StyleType.FontSize)
-			targetContainer.style.fontSize = style;
-	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ToggleTreeStyle(style, styleType){
 
-		let selection = document.getSelection();
+    CopyContainerStyles(anchorTree, newTree) {
+        if (newTree.textContent.length !== 0) {
+            newTree.style.color = anchorTree.style.color;
+            newTree.style.fontFamily = anchorTree.style.fontFamily;
+            newTree.style.backgroundColor = anchorTree.style.backgroundColor;
+            newTree.style.fontSize = anchorTree.style.fontSize;
+        }
+    }
+
+    ApplyNewStyle(targetContainer, style, styleType) {
+        if (styleType == StyleType.Color)
+            targetContainer.style.color = style;
+        else if (styleType == StyleType.FontFamily)
+            targetContainer.style.fontFamily = style;
+        else if (styleType == StyleType.BackgroundColor)
+            targetContainer.style.backgroundColor = style;
+        else if (styleType == StyleType.FontSize)
+            targetContainer.style.fontSize = style;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ToggleTreeStyle(style, styleType) {
+
+        let selection = document.getSelection();
         if (selection.type === 'Caret') {
             this.Selection_LazySelector_Word();
         }
-		let range = selection.getRangeAt(0);
+        let range = selection.getRangeAt(0);
 
-		if (selection.type === 'Range') {
+        if (selection.type === 'Range') {
             if (this.RangeTree_Start === this.RangeTree_End) {
 
                 if (selection.toString().trim().length !== this.RangeTree_Start.textContent.trim().length) {
                     if (this.atContainerStart(this.RangeTree_Start, range) === true) {
-                        let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
-						this.CopyContainerStyles(this.RangeTree_Start, end);
+                        this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
+
                     }
                     else {
                         if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                            let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
-							this.CopyContainerStyles(this.RangeTree_Start, end);
+                            this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
+
                         }
-                        let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
-						this.CopyContainerStyles(this.RangeTree_Start, front);					
+                        this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
+
                     }
                 }
                 let caretPosition = this.RangeTree_Start.textContent.length;
                 let offset = 0;
-							
-				this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+
+                this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
                 offset = this.Core_MergeIdenticalTrees(this.RangeTree_Start);
-				selection.setPosition(this.GetTreeNode(this.RangeTree_End), caretPosition + offset);					
+                selection.setPosition(this.GetTailofTree(this.RangeTree_End), caretPosition + offset);
             }
             else {
                 //Figure out if I'm adding or Removing Tags
@@ -1283,28 +1277,27 @@ export class TextEditorObject {
 
                 if (range.startOffset !== 0) {
                     //Function 1
-                    let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
-                    this.CopyContainerStyles(this.RangeTree_Start, front);
-					//this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+                    this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
+
                 }
                 //else { //Handle the RangeTree_Start to calculate the caretStartPosition
-					this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
-                    caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
+                this.ApplyNewStyle(this.RangeTree_Start, style, styleType);
+                caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
                 //}
 
                 //Possible Selection Patterns for Middle Nodes
                 //1. Entire Tree iter is Selected
-                let iter = { block: this.StartBlock, tree: this.RangeTree_Start.nextSibling };
+                let iter = { block: this.StartBlock, tree: this.Iterate_Tree_Next(this.RangeTree_Start) };
                 let tempiter = this.RangeTree_Start;
                 while (iter.tree !== this.RangeTree_End) {
                     if (iter.tree === null) {
-                        iter = this.Block_Traversal_Find_First_Tree_In_NextBlock(iter.block, tempiter);
+                        iter = this.Block_Traversal_Iterate_To_Next(iter.block, tempiter);
                     }
                     else {
                         this.ApplyNewStyle(iter.tree, style, styleType);
                         this.Core_MergeIdenticalTree_Previous(iter.tree);
                         tempiter = iter.tree;
-                        iter.tree = iter.tree.nextSibling;
+                        iter.tree = this.Iterate_Tree_Next(iter.tree);
                     }
                 }
 
@@ -1312,8 +1305,7 @@ export class TextEditorObject {
                 //1. Entire End Tree is Selected - divide not necessary
                 //2. Front Half of End Tree is Selected - Do division
                 if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                    let end = this.Core_DivideContainer_New_End(this.RangeTree_End, Const.Tree);
-					this.CopyContainerStyles(this.RangeTree_End, end);
+                    this.Core_DivideContainer_New_End(this.RangeTree_End, Const.Tree);
                 }
                 this.ApplyNewStyle(this.RangeTree_End, style, styleType);
                 caretEndPosition += this.Core_MergeIdenticalTrees(this.RangeTree_End);
@@ -1325,20 +1317,162 @@ export class TextEditorObject {
             }
 
         }
-		
-		
-		
-	}
-	
+
+
+
+    }
+
+    Iterate_Tree_Next(tree) {
+        let next = Iterate_Sibling_Next(tree);
+        if (next !== null) {
+            if (next.tagName === Const.Link) {
+                next = Iterate_FirstChild(next);
+            }
+        }
+        else {
+            if (tree.parentNode.tagName === Const.Link) {
+                next = this.Iterate_Tree_Next(tree.parentNode);
+            }
+        }
+        return next;
+    }
+
+
+    ToggleLink(behavior) {
+
+        let selection = document.getSelection();
+        if (behavior === Behavior.Add) {
+
+            if (selection.type === 'Caret') {
+                this.Selection_LazySelector_Word();
+            }
+            let range = selection.getRangeAt(0);
+
+            if (selection.type === 'Range' && this.StartBlock === this.EndBlock) {
+                let link = 'https://';
+                if (this.RangeTree_Start.parentNode.tagName === Const.Link) {
+                    link = this.RangeTree_Start.parentNode.href;
+                }
+                else if (this.RangeTree_End.parentNode.tagName === Const.Link) {
+                    link = this.RangeTree_End.parentNode.href;
+                }
+
+                link = prompt('Enter a URL:', link);
+                if (link !== null) {
+
+                    if (this.RangeTree_Start.parentNode.tagName === Const.Link) {
+                        this.RangeTree_Start.parentNode.href = link;
+                    }
+                    else if (this.RangeTree_End.parentNode === Const.Link) {
+                        this.RangeTree_End.parentNode.href = link;
+                    }
+                    else {
+
+
+                        if (this.atContainerStart(this.RangeTree_Start, range) === false) {
+                            this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
+                        }
+                        if (this.atContainerEnd(this.RangeTree_End, range) === false) {
+                            this.Core_DivideContainer_New_End(this.RangeTree_End, Const.Tree);
+                        }
+
+                        let deepclone = new CloneWithRange(this.RangeTree_Start.parentNode, range);
+                        let alink = deepclone.GetMiddle_TrimInverseSelections(Const.Link);
+                        this.RangeTree_Start.insertAdjacentElement('beforebegin', alink);
+                        alink.href = link;
+                        let iter = this.RangeTree_Start;
+                        while (iter !== this.RangeTree_End && iter !== null) {
+                            let temp = iter;
+                            iter = this.Iterate_Tree_Next(iter);
+                            temp.remove();
+                        }
+                        if (iter === this.RangeTree_End) {
+                            iter.remove();
+                        }
+                        let lastchild = this.GetTailofTree(Iterate_LastChild(alink));
+                        selection.setBaseAndExtent(this.GetTailofTree(Iterate_FirstChild(alink)), 0, lastchild, lastchild.textContent.length);
+
+                    }
+                }
+            }
+        }
+        else {
+
+            if (this.RangeTree_Start.parentNode.tagName === Const.Link && this.RangeTree_Start.parentNode === this.RangeTree_End.parentNode) {
+                let length = Iterate_LastChild(this.RangeTree_End.parentNode).textContent.length;
+                let offset = 0;
+                let clone = null;
+                Array.from(this.RangeTree_Start.parentNode.childNodes).forEach((node) => {
+                    clone = node.cloneNode(true);
+                    if (isIgnorable(clone) === false) {
+                        this.RangeTree_Start.parentNode.insertAdjacentElement('beforebegin', clone);
+                        offset = this.Core_MergeIdenticalTrees(clone);
+                    }
+
+                });
+                this.RangeTree_Start.parentNode.remove();
+                offset = this.Core_MergeIdenticalTrees(clone);
+                let text = this.GetTailofTree(clone);
+                selection.setPosition(text, length + offset, text, length + offset);
+            }
+            else {
+
+                let iter = { block: this.StartBlock, tree: this.RangeTree_Start };
+                let tempiter = this.RangeTree_Start;
+                let clone = this.GetTailofTree(this.RangeTree_Start);
+                while (iter.tree !== this.RangeTree_End) {
+                    if (iter.tree === null) {
+                        iter = this.Block_Traversal_Iterate_To_Next(iter.block, tempiter);
+                    }
+                    else {
+
+                        tempiter = iter.tree;
+                        iter.tree = this.Iterate_Tree_Next(iter.tree);
+                        let temp = tempiter;
+                        if (temp.parentNode.tagName === Const.Link) {
+                            Array.from(temp.parentNode.childNodes).forEach((node) => {
+                                clone = node.cloneNode(true);
+                                temp.parentNode.insertAdjacentElement('beforebegin', clone);
+                                tempiter = clone;
+                                this.Core_MergeIdenticalTree_Previous(clone);
+                            });
+                            temp.parentNode.remove();
+                            this.Core_MergeIdenticalTree_Previous(iter.tree);
+                        }
+                    }
+                }
+                let offset = 0;
+                if (this.RangeTree_End.parentNode.tagName === Const.Link) {
+
+                    let clone = null;
+                    Array.from(this.RangeTree_End.parentNode.childNodes).forEach((node) => {
+                        clone = node.cloneNode(true);
+                        this.RangeTree_End.parentNode.insertAdjacentElement('beforebegin', clone);
+                        offset = this.Core_MergeIdenticalTrees(clone);
+                    });
+                    this.RangeTree_End.parentNode.remove();
+                    offset = this.Core_MergeIdenticalTrees(clone);
+                    let text = this.GetTailofTree(clone);
+                    selection.setPosition(text, length + offset, text, length + offset);
+                }
+                else {
+                    offset = this.Core_MergeIdenticalTree_Previous(this.RangeTree_End);
+                    let text = this.GetTailofTree(this.RangeTree_End);
+                    selection.setPosition(text, length + offset, text, length + offset);
+                }
+            }
+        }
+    }
+
     //Applies a Style to the selected text
     //If a button is clicked, it changes the focus and selection.
     //Function needs to capture the text node and the offset to put the caret back on the text node.
     ToggleTreeTag(StyleTag) {
-		let selection = document.getSelection();
+        let selection = document.getSelection();
         if (selection.type === 'Caret') {
             this.Selection_LazySelector_Word();
         }
-		let range = selection.getRangeAt(0);
+        let range = selection.getRangeAt(0);
         //Solution
         //1. Divide Containers from selection to maintain 1 text node per a tree container
         //2. Preserve target container during divide
@@ -1353,17 +1487,14 @@ export class TextEditorObject {
                 if (selection.toString().trim().length !== this.RangeTree_Start.textContent.trim().length) {
                     //Function 1
                     if (this.atContainerStart(this.RangeTree_Start, range) === true) {
-                        let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
-						this.CopyContainerStyles(this.RangeTree_Start, end);
+                        this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
                     }
                     else {
 
                         if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                            let end = this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
-							this.CopyContainerStyles(this.RangeTree_Start, end);
+                            this.Core_DivideContainer_New_End(this.RangeTree_Start, Const.Tree);
                         }
-                        let start = this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
-						this.CopyContainerStyles(this.RangeTree_Start, start);
+                        this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
                     }
                 }
                 let caretPosition = this.RangeTree_Start.textContent.length;
@@ -1371,8 +1502,8 @@ export class TextEditorObject {
                 // All Trees Are full Selection After Divide
                 this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, Behavior.Toggle);
                 offset = this.Core_MergeIdenticalTrees(this.RangeTree_Start);
-				selection.setBaseAndExtent(this.GetTreeNode(this.RangeTree_Start), offset, this.GetTreeNode(this.RangeTree_End), caretPosition + offset);			
-				
+                selection.setBaseAndExtent(this.GetTailofTree(this.RangeTree_Start), offset, this.GetTailofTree(this.RangeTree_End), caretPosition + offset);
+
             }
             else {
                 //Figure out if I'm adding or Removing Tags
@@ -1386,38 +1517,34 @@ export class TextEditorObject {
                 //1. Entire Start Tree is Selected
                 //2. Back Half of Start Tree is Selected
                 if (range.startOffset !== 0) {
-                    let front = this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
-					this.CopyContainerStyles(this.RangeTree_Start, front);
-                    //this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
-					
+                    this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
                 }
                 //else { //Handle the RangeTree_Start to calculate the caretStartPosition
-                    this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
-                    caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
+                this.Core_ImplementTag_Tree(this.RangeTree_Start, StyleTag, behavior);
+                caretStartPosition = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
                 //}
-				
+
                 //Possible Selection Patterns for Middle Nodes
                 //1. Entire Tree iter is Selected
-                let iter = { block: this.StartBlock, tree: this.RangeTree_Start.nextSibling };
+                let iter = { block: this.StartBlock, tree: this.Iterate_Tree_Next(this.RangeTree_Start) };
                 let tempiter = this.RangeTree_Start;
                 while (iter.tree !== this.RangeTree_End) {
                     if (iter.tree === null) {
-                        iter = this.Block_Traversal_Find_First_Tree_In_NextBlock(iter.block, tempiter);
+                        iter = this.Block_Traversal_Iterate_To_Next(iter.block, tempiter);
                     }
                     else {
                         this.Core_ImplementTag_Tree(iter.tree, StyleTag, behavior);
                         this.Core_MergeIdenticalTree_Previous(iter.tree);
                         tempiter = iter.tree;
-                        iter.tree = iter.tree.nextSibling;
+                        iter.tree = this.Iterate_Tree_Next(iter.tree);
                     }
                 }
 
-                //Possible Selection Patterns for 
+                //Possible Selection Patterns for
                 //1. Entire End Tree is Selected - divide not necessary
                 //2. Front Half of End Tree is Selected - Do division
                 if (this.atContainerEnd(this.RangeTree_End, range) === false) {
-                    let end = this.Core_DivideContainer_New_End(this.RangeTree_End, Const.Tree);
-					this.CopyContainerStyles(this.RangeTree_Start, end);
+                    this.Core_DivideContainer_New_End(this.RangeTree_End, Const.Tree);
                 }
                 this.Core_ImplementTag_Tree(this.RangeTree_End, StyleTag, behavior);
                 caretEndPosition += this.Core_MergeIdenticalTrees(this.RangeTree_End);
@@ -1440,55 +1567,44 @@ export class TextEditorObject {
 
     //Takes in a the Range's startContainer and traverses to the Tree Node
     //If the input is not a text node, it is the parent container of a br tag
-    FindTargetStartTree(TextNode) {
+    FindTargetTree(Block, TextNode) {
+
+        if (this.Block_is_Standard_Structure(Block)) {
+            if (TextNode === Block) {
+                TextNode = this.NormalizeBlock(TextNode);
+                document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+            }
+            else {
+                while (TextNode.parentNode !== Block && TextNode.tagName !== Const.Tree) {
+                    TextNode = TextNode.parentNode;
+                }
+            }
+        }
+        else if (this.Block_is_List_Structure(Block)) {
+            if (TextNode.parentNode === Block) {
+                TextNode = this.NormalizeBlock(TextNode);
+                document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+            }
+            else {
+                while (TextNode.parentNode.tagName !== ListStructures.ListItem && TextNode.tagName !== Const.Tree) {
+                    TextNode = TextNode.parentNode;
+                }
+            }
+        }
 
         if (TextNode.nodeType === Node.TEXT_NODE) {
-            while (TextNode.tagName !== Const.Tree) {
-                TextNode = TextNode.parentNode;
-            }
-        }
-        else if (TextNode.tagName !== Const.Tree) {
-            if (TextNode.tagName === Void.Break) {
-                TextNode = TextNode.parentNode;
-            }
-            if (TextNode.tagName !== Const.Tree) {
-                if (TextNode.firstChild.tagName !== Const.Tree) {
-                    console.log('Find Target Start Tree: Normalizing Block');
-                    TextNode = this.NormalizeBlock(TextNode);
-                    document.getSelection().getRangeAt(0).setStart(TextNode, 0);
-                }
-                else {
-                    TextNode = TextNode.firstChild;
-                }
-
+            if (TextNode.previousSibling !== null) {
+                let element = document.createElement(Const.Tree);
+                let text = document.createTextNode(TextNode.textContent);
+                element.appendChild(text);
+                TextNode.parentNode.replaceChild(element, TextNode);
+                let length = element.textContent.length;
+                this.Core_MergeIdenticalTrees(element);
+                document.getSelection().getRangeAt(0).setStart(text, length);
+                TextNode = element;
             }
         }
 
-        return TextNode;
-    }
-    //Browsers treat the end differently from the start, the selecting a target has an extra edge case
-    FindTargetEndTree(TextNode) {
-        if (TextNode.nodeType === Node.TEXT_NODE) {
-            while (TextNode.tagName !== Const.Tree) {
-                TextNode = TextNode.parentNode;
-            }
-        }
-        else if (TextNode.tagName !== Const.Tree) {
-
-            if (TextNode.tagName === Void.Break) {
-                TextNode = TextNode.parentNode;
-            }
-            if (TextNode.tagName !== Const.Tree) {
-                if (TextNode.firstChild.tagName !== Const.Tree) {
-                    console.log('Find Target End Tree: Normalizing Block');
-                    this.NormalizeBlock(TextNode);
-                    document.getSelection().getRangeAt(0).setStart(TextNode, 0);
-                }
-                else {
-                    TextNode = TextNode.firstChild;
-                }
-            }
-        }
         return TextNode;
     }
 
@@ -1496,7 +1612,7 @@ export class TextEditorObject {
 
         let element = document.createElement(Const.Tree);
         element.appendChild(document.createElement(Void.Break));
-        BlockNode.removeChild(BlockNode.firstChild);
+        BlockNode.removeChild(Iterate_FirstChild(BlockNode));
         BlockNode.appendChild(element);
         BlockNode = element;
         return element;
@@ -1505,6 +1621,7 @@ export class TextEditorObject {
     RepairTargetTree() { //Prototype Code - Default Browser Behaviors can mishandle the tree structure
         //Normalize the RangeTree, If a tree has more than 2 children, adding a character wasn't added in a new tree
         let range = document.getSelection().getRangeAt(0);
+
         if (this.RangeTree_Start !== null) {
             if (this.RangeTree_Start.childNodes.length >= 2) {
                 if (this.RangeTree_Start.lastChild.tagName === Void.Break) {
@@ -1513,17 +1630,26 @@ export class TextEditorObject {
                     this.RangeTree_Start.removeChild(this.RangeTree_Start.lastChild);
                 }
                 else {
-                    console.log('Repair Target Tree: Normalizing Block');
+                    console.log('Repair Target Tree: RangeTree');
                     let clone = this.RangeTree_Start.lastChild.cloneNode(true);
                     this.RangeTree_Start.lastChild.remove();
                     let element = document.createElement(Const.Tree);
                     element.appendChild(clone);
                     this.RangeTree_Start.insertAdjacentElement('afterend', element);
-                    range.setStart(this.GetTreeNode(element), element.textContent.length);
+                    let length = element.textContent.length;
+                    this.Core_MergeIdenticalTrees(element);
+                    range.setStart(this.GetTailofTree(element), length);
                     range.setEnd(range.startContainer, range.startOffset);
                 }
             }
+
         }
+
+        return range;
+    }
+
+    NormalizeTreelessTextNode() {
+        let range = document.getSelection().getRangeAt(0);
 
         return range;
     }
@@ -1536,47 +1662,43 @@ export class TextEditorObject {
 
     UpdateTargets() {
         let range = this.RepairTargetTree();
-        //console.log(`${range.startOffset}, ${range.endOffset}`);
 
         this.StartBlock = this.Target_FindBlock(range.startContainer);
         this.EndBlock = this.Target_FindBlock(range.endContainer);
-
-        this.RangeTree_Start = this.FindTargetStartTree(range.startContainer);
+        this.RangeTree_Start = this.FindTargetTree(this.StartBlock, range.startContainer);
+        //this.RangeTree_Start = this.FindTargetStartTree(range.startContainer);
         if (range.startContainer === range.endContainer) {
             this.RangeTree_End = this.RangeTree_Start;
         }
         else {
-            this.RangeTree_End = this.FindTargetEndTree(range.endContainer);
+            this.RangeTree_End = this.FindTargetTree(this.EndBlock, range.endContainer);
+            //this.RangeTree_End = this.FindTargetEndTree(range.endContainer);
         }
-		
-		
-        this.XTargetStart = this.RangeTree_Start;
-        this.XTargetEnd = this.RangeTree_End;
     }
 
     ToggleInterfaceButtons() {
-		if(this.StandardBlockSelector !== null)
-			this.StandardBlockSelector.value = this.StartBlock.tagName;
-		if(document.getSelection().type === 'Caret'){
-			if(this.FontFamilySelector !== null)
-				this.FontFamilySelector.value = this.RangeTree_Start.style.fontFamily;
-			if(this.ColorSelector !== null)
-				this.ColorSelector.value = this.RangeTree_Start.style.color;
-			if(this.BackgroundColorSelector !== null)
-				this.BackgroundColorSelector.value = this.RangeTree_Start.style.backgroundColor;
-			if(this.FontSizeSelector !== null)
-				this.FontSizeSelector.value = this.RangeTree_Start.style.fontSize;
-		}
-		else{
-			if(this.FontFamilySelector !== null)
-				this.FontFamilySelector.value = "none";
-			if(this.ColorSelector !== null)
-				this.ColorSelector.value = "none";
-			if(this.BackgroundColorSelector !== null)
-				this.BackgroundColorSelector.value = "none";
-			if(this.FontSizeSelector !== null)
-				this.FontSizeSelector.value = "none";
-		}
+        if (this.StandardBlockSelector !== null)
+            this.StandardBlockSelector.value = this.StartBlock.tagName;
+        if (document.getSelection().type === 'Caret') {
+            if (this.FontFamilySelector !== null)
+                this.FontFamilySelector.value = this.RangeTree_Start.style.fontFamily;
+            if (this.ColorSelector !== null)
+                this.ColorSelector.value = this.RangeTree_Start.style.color;
+            if (this.BackgroundColorSelector !== null)
+                this.BackgroundColorSelector.value = this.RangeTree_Start.style.backgroundColor;
+            if (this.FontSizeSelector !== null)
+                this.FontSizeSelector.value = this.RangeTree_Start.style.fontSize;
+        }
+        else {
+            if (this.FontFamilySelector !== null)
+                this.FontFamilySelector.value = "none";
+            if (this.ColorSelector !== null)
+                this.ColorSelector.value = "none";
+            if (this.BackgroundColorSelector !== null)
+                this.BackgroundColorSelector.value = "none";
+            if (this.FontSizeSelector !== null)
+                this.FontSizeSelector.value = "none";
+        }
 
     }
 
@@ -1589,15 +1711,15 @@ export class TextEditorObject {
             let iter = this.StartBlock;
             do {
                 this.PlayHighLightAnimation_1(iter);
-                iter = iter.nextSibling;
+                iter = Iterate_Sibling_Next(iter);
                 //iter.classList.add('c-menu');
             }
             while (iter !== this.EndBlock);
         }
 
         //Todo: highLight inner attributes
-        this.XTargetStart.classList.add('text-bg');
-        this.XTargetEnd.classList.add('text-bg');
+        this.RangeTree_Start.classList.add('text-bg');
+        this.RangeTree_End.classList.add('text-bg');
 
         this.PlayHighLightAnimation_2(this.RangeTree_Start);
         this.PlayHighLightAnimation_2(this.RangeTree_End);
@@ -1623,11 +1745,12 @@ export class TextEditorObject {
 
     ClearTargetSelections() {
         //Error: Cannon Read classList of TextNodes
-        if (this.XTargetStart !== null) {
-            this.XTargetStart.classList.remove('text-bg');
+
+        if (this.RangeTree_Start !== null) {
+            this.RangeTree_Start.classList.remove('text-bg');
         }
-        if (this.XTargetEnd !== null) {
-            this.XTargetEnd.classList.remove('text-bg');
+        if (this.RangeTree_End !== null) {
+            this.RangeTree_End.classList.remove('text-bg');
         }
 
     };
@@ -1636,38 +1759,38 @@ export class TextEditorObject {
         let rangeclone = document.getSelection().getRangeAt(0).cloneRange();
 
         if (this.atContainerEnd(this.RangeTree_End, rangeclone)) {
-            
-            if (this.GetTreeNode(this.RangeTree_End).nodeType === Node.TEXT_NODE) {
-                if (this.RangeTree_Start.nextSibling === null) {
-                    
+
+            if (this.GetTailofTree(this.RangeTree_End).nodeType === Node.TEXT_NODE) {
+                if (Iterate_Sibling_Next(this.RangeTree_Start) === null) {
+
                     let firstTree = this.CreateNewTextTree();
                     this.RangeTree_Start.insertAdjacentElement('afterend', firstTree);
                     this.RangeTree_Start = firstTree;
                 }
                 else {
-                    this.RangeTree_Start = this.RangeTree_Start.nextSibling;
+                    this.RangeTree_Start = Iterate_Sibling_Next(this.RangeTree_Start);
                 }
             }
-            
+
             let newTree = this.CreateNewTextTree();
             this.RangeTree_Start.insertAdjacentElement('afterend', newTree);
             rangeclone.setStart(newTree, 0);
             rangeclone.setEnd(newTree, 0);
         }
         else {
-            
+
             if (this.atContainerStart(this.RangeTree_Start, rangeclone)) {
-                
+
                 let newtree = this.CreateNewTextTree();
                 this.RangeTree_Start.insertAdjacentElement('beforebegin', newtree);
                 rangeclone.setStart(newtree, 0);
                 rangeclone.setEnd(newtree, 0);
             }
             else {
-                
+
                 this.Core_DivideContainer_New_Front(this.RangeTree_Start, Const.Tree);
                 this.RangeTree_Start.insertAdjacentElement('beforebegin', this.CreateNewTextTree());
-                let text = this.GetTreeNode(this.RangeTree_Start);
+                let text = this.GetTailofTree(this.RangeTree_Start);
                 rangeclone.setStart(text, 0);
                 rangeclone.setEnd(text, 0);
             }
@@ -1681,16 +1804,16 @@ export class TextEditorObject {
         if (this.atContainerEnd(this.EndBlock, rangeclone)) {
             newparagraph = this.CreateNewBlock();
             this.StartBlock.insertAdjacentElement('afterend', newparagraph);
-            newparagraph = newparagraph.firstChild;
+            newparagraph = Iterate_FirstChild(newparagraph);
         }
         else if (this.atContainerStart(this.StartBlock, rangeclone)) {
             newparagraph = this.CreateNewBlock();
             this.EndBlock.insertAdjacentElement('beforebegin', newparagraph);
-            newparagraph = newparagraph.firstChild;
+            newparagraph = Iterate_FirstChild(newparagraph);
         }
         else {
             this.Core_DivideContainer_New_Front(this.StartBlock, this.StartBlock.tagName);
-            newparagraph = this.GetTreeNode(this.StartBlock);
+            newparagraph = this.GetTailofTree(this.StartBlock);
         }
         rangeclone.setStart(newparagraph, 0);
         rangeclone.setEnd(newparagraph, 0);
@@ -1706,28 +1829,28 @@ export class TextEditorObject {
             if (this.atContainerStart(this.StartBlock, rangeclone) === true) {
                 event.preventDefault();
                 event.stopPropagation();
-                let previousBlock = this.GetPreviousBlock(this.StartBlock);
-                if (this.Block_is_Standard_Structure(this.StartBlock)) {
-                    if (previousBlock !== null) {
-                        rangeclone = this.BackSpace_BlockBehavior(previousBlock);
-                        selection.removeAllRanges();
-                        selection.addRange(rangeclone);
-                    }
+
+                let previous = this.Block_Traversal_Iterate_To_Previous(this.StartBlock, this.RangeTree_Start);
+                if (previous.block !== null) {
+                    rangeclone = this.Delete_BKWD_BlockBehavior(previous);
+                    selection.removeAllRanges();
+                    selection.addRange(rangeclone);
                 }
+
             }
             else {
-                let previousTree = this.RangeTree_Start.previousSibling;
+                let previousTree = Iterate_Sibling_Previous(this.RangeTree_Start);
                 if (this.RangeTree_Start.textContent.length === 1) {
                     if (previousTree !== null) {
                         event.preventDefault();
                         event.stopPropagation();
-                        let previous = this.GetTreeNode(previousTree);
-                        if (previous.nodeType === Node.TEXT_NODE) {
+                        let tail = this.GetTailofTree(previousTree);
+                        if (previousTree.nodeType === Node.TEXT_NODE) {
                             this.RangeTree_Start.remove();
-                            let length = previous.textContent.length;
+                            let length = tail.textContent.length;
                             this.Core_MergeIdenticalTrees(previousTree);
-                            rangeclone.setStart(previous, length);
-                            rangeclone.setEnd(previous, length);
+                            rangeclone.setStart(tail, length);
+                            rangeclone.setEnd(tail, length);
                         }
                         else {
 
@@ -1741,27 +1864,28 @@ export class TextEditorObject {
                         selection.addRange(rangeclone);
                     }
                     else {
-                        if (this.StartBlock.previousSibling === null) {//!IMPORTANT Recreate the First Block in the Document
+                        let previousBlock = Iterate_Sibling_Previous(this.StartBlock);
+                        if (previousBlock === null) {//!IMPORTANT Recreate the First Block in the Document
                             event.preventDefault();
                             event.stopPropagation();
                             let block = this.CreateNewBlock();
                             this.StartBlock.insertAdjacentElement('beforebegin', block);
                             this.Page.replaceChild(block, this.StartBlock);
-                            rangeclone.setStart(block.firstChild, 0);
-                            rangeclone.setEnd(block.firstChild, 0);
+                            rangeclone.setStart(Iterate_FirstChild(block), 0);
+                            rangeclone.setEnd(rangeclone.startContainer, 0);
                             selection.removeAllRanges();
                             selection.addRange(rangeclone);
                         }
                     }
 
                 }
-                else if (this.GetTreeNode(previousTree).nodeType !== Node.TEXT_NODE) { //Remove BR Tree and Try to Merge
+                else if (this.GetTailofTree(previousTree).nodeType !== Node.TEXT_NODE) { //Remove BR Tree and Try to Merge
                     event.preventDefault();
                     event.stopPropagation();
                     previousTree.remove();
                     let length = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
-                    rangeclone.setStart(this.GetTreeNode(this.RangeTree_Start), length);
-                    rangeclone.setEnd(this.GetTreeNode(this.RangeTree_Start), length);
+                    rangeclone.setStart(this.GetTailofTree(this.RangeTree_Start), length);
+                    rangeclone.setEnd(this.GetTailofTree(this.RangeTree_Start), length);
                     selection.removeAllRanges();
                     selection.addRange(rangeclone);
                 }
@@ -1777,23 +1901,24 @@ export class TextEditorObject {
             if (this.atContainerEnd(this.StartBlock, rangeclone)) {
                 event.preventDefault();
                 event.stopPropagation();
-                let nextBlock = this.GetNextBlock(this.StartBlock);
-                if (nextBlock !== null) {
-                    rangeclone = this.Delete_BlockBehavior(nextBlock);
+
+                let next = this.Block_Traversal_Iterate_To_Next(this.StartBlock, this.RangeTree_Start);
+                if (next.block !== null) {
+                    rangeclone = this.Delete_FWD_NextBlockBehavior(next);
                     selection.removeAllRanges();
                     selection.addRange(rangeclone);
                 }
             }
             else {
-                let nextTree = this.RangeTree_End.nextSibling;               //TextContent Length 1 is testing for a single character, Stable?
-                if (this.GetTreeNode(nextTree).nodeType !== Node.TEXT_NODE || nextTree.textContent.length === 1) {
+                let nextTree = Iterate_Sibling_Next(this.RangeTree_Start);               //TextContent Length 1 is testing for a single character, Stable?
+                if (this.GetTailofTree(nextTree).nodeType !== Node.TEXT_NODE || nextTree.textContent.length === 1) {
                     event.preventDefault();
                     event.stopPropagation();
                     nextTree.remove();
                     let length = this.RangeTree_Start.textContent.length;
                     this.Core_MergeIdenticalTrees(this.RangeTree_Start);
-                    rangeclone.setStart(this.GetTreeNode(this.RangeTree_Start), length);
-                    rangeclone.setEnd(this.GetTreeNode(this.RangeTree_Start), length);
+                    rangeclone.setStart(this.GetTailofTree(this.RangeTree_Start), length);
+                    rangeclone.setEnd(this.GetTailofTree(this.RangeTree_Start), length);
                     selection.removeAllRanges();
                     selection.addRange(rangeclone);
                 }
@@ -1803,15 +1928,31 @@ export class TextEditorObject {
     }
 
     // Editor Text Traversal - Finds the Next Block and returns the new block and tree iters
-    Block_Standard_Traversal_SubRoutine(block) {
+    Block_Standard_FWD_Traversal_SubRoutine(block) {
         let tree = null;
-        block = block.nextSibling;
-        tree = block.firstChild;
-        //Search depth for next blocks of different types.
-        while (tree.tagName !== Const.Tree) {
-            tree = tree.firstChild;
+        block = Iterate_Sibling_Next(block);
+        if (block !== null) {
+            tree = this.Block_Traverse_GetFirstTree(block);
         }
         return { block, tree };
+    }
+
+    Block_Standard_BKWD_Traversal_SubRoutine(block) {
+        let tree = null;
+        block = Iterate_Sibling_Previous(block);
+        if (block !== null) {
+            tree = this.Block_Traverse_GetLastTree(block);
+        }
+        return { block, tree };
+    }
+
+    Block_Standard_GetFirstTree(block) {
+        let tree = Iterate_FirstChild(block);
+        return tree;
+    }
+    Block_Standard_GetLastTree(block) {
+        let tree = Iterate_LastChild(block);
+        return tree;
     }
 
     Block_List_Behavior_ShiftEnterKey() {
@@ -1833,36 +1974,36 @@ export class TextEditorObject {
         let currentListItem = this.RangeTree_Start.parentNode;
         if (this.RangeTree_Start.textContent.length === 0) {
             // First Enter Creates a list item, second enter deletes and exits the list block into a new paragraph
-            if (currentListItem === this.StartBlock.firstChild) {
+            if (currentListItem === Iterate_FirstChild(this.StartBlock)) {
                 let li = this.CreateNewListItem();
                 currentListItem.insertAdjacentElement('afterend', li);
-                rangeclone.setStart(li.firstChild, 0);
-                rangeclone.setEnd(li.firstChild, 0);
+                rangeclone.setStart(Iterate_FirstChild(li), 0);
+                rangeclone.setEnd(rangeclone.startContainer, 0);
             }
             else {
                 this.StartBlock.removeChild(currentListItem);
                 let block = this.CreateNewBlock();
                 this.StartBlock.insertAdjacentElement('afterend', block);
-                rangeclone.setStart(block.firstChild, 0);
+                rangeclone.setStart(Iterate_FirstChild(block), 0);
             }
         }
         else {
             if (this.atContainerStart(currentListItem, rangeclone)) {
                 let listitem = this.CreateNewListItem();
                 currentListItem.insertAdjacentElement('beforebegin', listitem);
-                rangeclone.setStart(listitem.firstChild, 0);
-                rangeclone.setEnd(listitem.firstChild, 0);
+                rangeclone.setStart(Iterate_FirstChild(listitem), 0);
+                rangeclone.setEnd(rangeclone.startContainer, 0);
 
             }
             else if (this.atContainerEnd(currentListItem, rangeclone)) {
                 let listitem = this.CreateNewListItem();
                 currentListItem.insertAdjacentElement('afterend', listitem);
-                rangeclone.setStart(listitem.firstChild, 0);
-                rangeclone.setEnd(listitem.firstChild, 0);
+                rangeclone.setStart(Iterate_FirstChild(listitem), 0);
+                rangeclone.setEnd(rangeclone.startContainer, 0);
             }
             else {
                 this.Core_DivideContainer_New_Front(currentListItem, ListStructures.ListItem);
-                rangeclone.setStart(this.GetTreeNode(currentListItem), 0);
+                rangeclone.setStart(this.GetTailofTree(currentListItem), 0);
                 rangeclone.setEnd(rangeclone.startContainer, 0);
             }
         }
@@ -1874,23 +2015,25 @@ export class TextEditorObject {
         let selection = document.getSelection();
         let rangeclone = selection.getRangeAt(0).cloneRange();
 
-        let targetList = this.RangeTree_Start.parentNode;
-        if (this.atContainerStart(targetList, rangeclone)) { //Handle Backspace at ListItem Level
+        let currentList = this.RangeTree_Start.parentNode;
+        if (this.atContainerStart(currentList, rangeclone)) { //Handle Backspace at ListItem Level
             event.preventDefault();
             event.stopPropagation();
-            if (this.StartBlock.firstChild === targetList) {
-                let previousBlock = this.GetPreviousBlock(this.StartBlock);
-                if (previousBlock !== null) {
-                    rangeclone = this.BackSpace_BlockBehavior(previousBlock);
+
+            if (Iterate_FirstChild(this.StartBlock) === currentList) {
+                let previous = this.Block_Traversal_Iterate_To_Previous(this.StartBlock, this.RangeTree_Start);
+                if (previous.block !== null) {
+                    rangeclone = this.Delete_BKWD_BlockBehavior(previous);
                 }
             }
             else {
-
-                if (targetList.previousSibling.textContent.length === 0) {
-                    targetList.previousSibling.remove();
+                let previousList = Iterate_Sibling_Previous(currentList);
+                if (previousList.textContent.length === 0) {
+                    previousList.remove();
                 }
-                else if (targetList.textContent.length === 0) {
-                    let last = this.GetLastNode(targetList.previousSibling);
+                else if (currentList.textContent.length === 0) {
+
+                    let last = this.GetTailofTree(Iterate_LastChild(previousList));
                     if (last.nodeType === Node.TEXT_NODE) {
                         rangeclone.setStart(last, last.textContent.length);
                         rangeclone.setEnd(last, last.textContent.length);
@@ -1899,20 +2042,18 @@ export class TextEditorObject {
                         rangeclone.setStart(last.parentNode, 0);
                         rangeclone.setEnd(last.parentNode, 0);
                     }
-                    targetList.remove();
+                    currentList.remove();
                 }
                 else {
                     let tempclone = document.createRange();
-                    tempclone.selectNodeContents(targetList.previousSibling);
-                    targetList.prepend(tempclone.extractContents());
+                    tempclone.selectNodeContents(previousList);
+                    currentList.prepend(tempclone.extractContents());
                     tempclone.detach();
                     let offset = this.Core_MergeIdenticalTree_Previous(this.RangeTree_Start);
-                    targetList.previousSibling.remove();
-                    rangeclone.setStart(this.GetTreeNode(this.RangeTree_Start), offset);
-                    rangeclone.setEnd(this.GetTreeNode(this.RangeTree_Start), offset);
+                    previousList.remove();
+                    rangeclone.setStart(this.GetTailofTree(this.RangeTree_Start), offset);
+                    rangeclone.setEnd(this.GetTailofTree(this.RangeTree_Start), offset);
                 }
-
-
             }
             selection.removeAllRanges();
             selection.addRange(rangeclone);
@@ -1927,18 +2068,19 @@ export class TextEditorObject {
         if (this.atContainerEnd(targetList, rangeclone)) {
             event.preventDefault();
             event.stopPropagation();
-            if (this.StartBlock.lastChild === targetList) {
-                let nextBlock = this.GetNextBlock(this.StartBlock);
-                if (nextBlock !== null) {
-                    rangeclone = this.Delete_BlockBehavior(nextBlock);
+            if (Iterate_LastChild(this.StartBlock) === targetList) {
+                let next = this.Block_Traversal_Iterate_To_Next(this.StartBlock, this.RangeTree_Start);
+                if (next.block !== null) {
+                    rangeclone = this.Delete_FWD_NextBlockBehavior(next);
                 }
             }
             else {
-                if (targetList.nextSibling.textContent.length === 0) {
-                    targetList.nextSibling.remove();
+                let nextSibling = Iterate_Sibling_Next(targetList);
+                if (nextSibling.textContent.length === 0) {
+                    nextSibling.remove();
                 }
                 else if (targetList.textContent.length === 0) {
-                    let first = this.GetFirstNode(targetList.nextSibling);
+                    let first = this.GetTailofTree(nextSibling);
                     if (first.nodeType === Node.TEXT_NODE) {
                         rangeclone.setStart(first, 0);
                         rangeclone.setEnd(first, 0);
@@ -1951,14 +2093,14 @@ export class TextEditorObject {
                 }
                 else {
                     let tempclone = document.createRange();
-                    tempclone.selectNodeContents(targetList.nextSibling);
+                    tempclone.selectNodeContents(nextSibling);
                     targetList.append(tempclone.extractContents());
                     tempclone.detach();
                     let offset = this.RangeTree_Start.textContent.length;
-                    targetList.nextSibling.remove();
+                    nextSibling.remove();
                     this.Core_MergeIdenticalTrees(this.RangeTree_Start);
-                    rangeclone.setStart(this.GetTreeNode(this.RangeTree_Start), offset);
-                    rangeclone.setEnd(this.GetTreeNode(this.RangeTree_Start), offset);
+                    rangeclone.setStart(this.GetTailofTree(this.RangeTree_Start), offset);
+                    rangeclone.setEnd(rangeclone.startContainer, offset);
                 }
             }
             selection.removeAllRanges();
@@ -1968,21 +2110,48 @@ export class TextEditorObject {
     }
 
     /* List Traversal - Has an Extra Step to traverse to the next list item before traversing to the next Block */
-    Block_List_Traversal_SubRoutine(block, LINode) {
-        let nextlistitem = LINode.nextSibling;
+    Block_List_FWD_Traversal_SubRoutine(block, LINode) {
+
+        let nextlistitem = Iterate_Sibling_Next(LINode);
         let tree = null;
         if (nextlistitem === null) {
-            block = block.nextSibling;
-            tree = block.firstChild;
-            while (tree.tagName !== Const.Tree) {
-                tree = treeiter.firstChild;
+            block = Iterate_Sibling_Next(block);
+            if (block !== null) {
+                tree = this.Block_Traverse_GetFirstTree(block);
             }
         }
         else {
-            tree = nextlistitem.firstChild;
+            tree = Iterate_FirstChild(nextlistitem);
         }
         return { block, tree };
     }
+
+    Block_List_BKWD_Traversal_SubRoutine(block, LINode) {
+        let prevlistitem = Iterate_Sibling_Previous(LINode);
+        let tree = null;
+        if (prevlistitem === null) {
+            block = Iterate_Sibling_Previous(block);
+            if (block !== null) {
+                tree = this.Block_Traverse_GetLastTree(block);
+            }
+        }
+        else {
+            tree = Iterate_LastChild(prevlistitem);
+        }
+        return { block, tree };
+    }
+
+    Block_List_GetFirstTree(block) {
+        let tree = Iterate_FirstChild(block);
+        tree = Iterate_FirstChild(tree);
+        return tree;
+    }
+    Block_List_GetLastTree(block) {
+        let tree = Iterate_LastChild(block);
+        tree = Iterate_LastChild(tree);
+        return tree;
+    }
+
 }
 
 
@@ -2001,7 +2170,7 @@ class CloneWithRange {
         Array.from(OriginalContainer.childNodes).forEach((child) => {
             let clonedChild = child.cloneNode(true);
             this.fragment.appendChild(clonedChild);
-            //console.log(clonedChild.style.color);
+
             //Traverse the OriginalContainer to find map the cloned start and end to the fragment
 
             //A Forward Traversal means the Start Container is found first
@@ -2081,9 +2250,9 @@ class CloneWithRange {
         }
         if (this.range.endContainer === OriginalRange.endContainer) {
             console.log('No End Found');
-            let endInit = this.fragment.lastChild;
+            let endInit = Iterate_LastChild(this.fragment);
             while (endInit.lastChild !== null) {
-                endInit = endInit.lastChild;
+                endInit = Iterate_LastChild(endInit);
             }
             if (endInit.nodeType === Node.TEXT_NODE) {
                 this.range.setEnd(endInit, endInit.textContent.length);
@@ -2105,27 +2274,21 @@ class CloneWithRange {
         this.range.detache();
     }
 
-    PrintFragment() {
-        console.log(this.fragment.childNodes);
-    }
-
-
     isElementEmpty(childNode) {
         let isEmpty = false;
-
-		if(childNode.textContent === ""){
-			isEmpty = true;
-		}
-		else {
-			while (childNode.lastChild !== null) {
-            childNode = childNode.lastChild;
-			}
-			if (childNode.nodeType !== Node.TEXT_NODE) {
-				if (childNode.tagName !== Void.Break) {
-                isEmpty = true;
-				}
-			}
-		}
+        if (childNode.textContent === "") {
+            isEmpty = true;
+        }
+        else {
+            while (Iterate_LastChild(childNode) !== null) {
+                childNode = Iterate_LastChild(childNode);
+            }
+            if (childNode.nodeType !== Node.TEXT_NODE) {
+                if (childNode.tagName !== Void.Break) {
+                    isEmpty = true;
+                }
+            }
+        }
         return isEmpty;
     }
 
@@ -2137,9 +2300,9 @@ class CloneWithRange {
         this.range.selectNodeContents(element);
         this.range.setStart(this.StartNode, this.StartOffset);
         this.range.deleteContents();
-
-        if (this.isElementEmpty(element.lastChild)) {
-            element.removeChild(element.lastChild);
+        let lastchild = element.lastChild;// Iterate_LastChild(element); //
+        if (this.isElementEmpty(lastchild)) {
+            element.removeChild(lastchild);
         }
         return element;
     }
@@ -2147,7 +2310,7 @@ class CloneWithRange {
     GetFront_Inclusive(ElementTag) {
         let element = document.createElement(ElementTag);
         element.appendChild(this.fragment);
-		
+
         this.range.selectNodeContents(element);
         this.range.setStart(this.EndNode, this.EndOffset);
         this.range.deleteContents();
@@ -2173,7 +2336,6 @@ class CloneWithRange {
     GetEnd_Inclusive(ElementTag) {
         let element = document.createElement(ElementTag);
         element.appendChild(this.fragment);
-        this.PrintFragment();
 
         this.range.selectNodeContents(element);
         this.range.setEnd(this.StartNode, this.StartOffset);
@@ -2198,4 +2360,46 @@ class CloneWithRange {
     }
 }
 
+function isWhiteSpace(node) {
+    return !/[^\t\n\r ]/.test(node.textContent);
+}
+function isIgnorable(node) {
+    return (node.nodeType === Node.COMMENT_NODE || (node.nodeType === Node.TEXT_NODE && isWhiteSpace(node)));
+}
+function Iterate_Sibling_Next(container) {
+    while (container = container.nextSibling) {
+        if (!isIgnorable(container)) {
+            return container;
+        }
+    }
+    return null;
+}
+function Iterate_Sibling_Previous(container) {
 
+    while (container = container.previousSibling) {
+        if (!isIgnorable(container)) {
+            return container;
+        }
+    }
+    return null;
+}
+function Iterate_FirstChild(parentNode) {
+    let child = parentNode.firstChild;
+    while (child) {
+        if (!isIgnorable(child)) {
+            return child;
+        }
+        child = child.nextSibling;
+    }
+    return null;
+}
+function Iterate_LastChild(parentNode) {
+    let child = parentNode.lastChild;
+    while (child) {
+        if (!isIgnorable(child)) {
+            return child;
+        }
+        child = child.previousSibling;
+    }
+    return null;
+}

@@ -9,7 +9,9 @@ export const Active = 'Active';
 export const Const = {
 	Block: 'P',
 	Format: 'P', //Not Used, Still Deciding
-	Tree: 'SPAN'
+	Tree: 'SPAN',
+	Link: 'A'
+
 };
 
 //Void Elements are Tags that can not have Text
@@ -88,16 +90,20 @@ export const ConstFontSizes = {
 */
 //BitWise Constants //No Extras = 0
 export const Bit = {
-	BasicTags: 1, // (1) Bold, Italic, Underline
-	AdvancedTags: (1 << 1), // (2) Strikethrough, Subscript, SuperScirpt
-	FontColorsOptions: (1 << 2), // (4)
-	FontBackgroundColorOptions: (1 << 3), // (8)
-	FontSizeOptions: (1 << 4), // (16)
-	FontFamilyOptions: (1 << 5),  // (32)
-	StandardHeaders: (1 << 6), //  (64)  H1 - H6
-	StandardBlockStyles: (1 << 7), // (128)   Standard Block Alignment and justify
-	ListBlocks: (1 << 8), //  (256)   Ordered and Unordered Lists
-	ListBlockFormats: (1 << 9), // (512) Not Used
+	DBStorage: 1, // (1)  Database Storage //If off, I can create white space nodes for formatting when copying html
+	BasicTags: (1 << 1), // (2) Bold, Italic, Underline
+	AdvancedTags: (1 << 2), // (4) Strikethrough, Subscript, SuperScirpt
+	Links: (1 << 3), // (8)  Links
+	FontColorsOptions: (1 << 4), // (16)
+	FontBackgroundColorOptions: (1 << 5), // (32)
+	FontSizeOptions: (1 << 6), // (64)
+	FontFamilyOptions: (1 << 7),  // (128)
+	StandardHeaders: (1 << 8), //  (256)  H1 - H6
+	StandardBlockStyles: (1 << 9), // (512)   Standard Block Alignment and justify
+	ListBlocks: (1 << 10), //  (1024)   Ordered and Unordered Lists
+	ListBlockFormats: (1 << 11), // (2048) Not Used
+
+	CustomClasses: (1 << 31), // (2,147,483,648)  Extra Options
 }
 
 export const StandardBlockStyles_textindent = {

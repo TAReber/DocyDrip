@@ -103,8 +103,8 @@ function DocyDrip_OpenEditor_Event(editableContainer){
 		button.title = description;	
 		button.addEventListener('click', handleBinding);
 		return button;	
-    };
-	
+	};
+
 	function AddNewOption(value, text) {
         let option = document.createElement('option');
         option.value = value;
@@ -141,7 +141,17 @@ function DocyDrip_OpenEditor_Event(editableContainer){
 		ObjectUIContainer.firstChild.append(box);
 		return {strikethrough, superscript, subscript };
 	};
-	
+
+	export function CreateLinkButton(ObjectUIContainer, bindings) {
+		let link = CreateButton(bindings.boundHandleLinkClick, '&#128279', 'Link');
+		let unlink = CreateButton(bindings.boundHandleUnLinkClick, '&#128682', 'Unlink');
+		let newbox = CreateGroupContainer();
+		newbox.append(link, unlink);
+		ObjectUIContainer.firstChild.append(newbox);
+		return {link, unlink};
+	}
+
+
 	export function	CreateStandardBlockTextIndent_Buttons(ObjectUIContainer, bindings){
 		let Indent = CreateButton(bindings.boundHandleIndentClick, '&#8640', 'Indent');
         let Outdent = CreateButton(bindings.boundHandleOutdentClick, '&#8636', 'Outdent');

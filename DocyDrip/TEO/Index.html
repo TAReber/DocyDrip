@@ -2,69 +2,134 @@
 
 <html>
 <head>
-	<link href="DocyDripSampleStyles.css" rel="stylesheet" />
-	<link href="DemoStyles.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <link href="DocyDripSampleStyles.css" rel="stylesheet" />
+    <link href="DemoStyles.css" rel="stylesheet" />
 </head>
-	<main>
-		<body style="margin: 10% 15%;">
-			<div class="box-col">
-				<div class="box-row box-center1">
-					<span class="text-center justify-center" style="height: 100px; width:100px;">click the paper and pen</span>
-					<button class="TEO-Selector-Event">📝</button>
-					<span class="text-center justify-center" style="height: 100px; width:100px;">Update Values to load different editors</span>
-				</div>
-				<br>
-				<div class="box-row box-center1">
-			
-					<div class="box-col">
-						<input type="text" id="input1" value="1023"/>
-						<input type="submit" value="Top Editor" onclick="update_one(this)">
-					</div>
-					<div class="box-col">
-						<input type="text" id="input2" value="362"/>
-						<input type="submit" value="Middle Editor" onclick="update_two(this)">
-					</div>
-					<div class="box-col">
-						<input type="text" id="input3" value="724">
-						<input type="submit" value="Bottom Editor" onclick="update_three(this)">
-					</div>
-				
-				</div>
+<body>
+    <main style="margin: 10% 15%;">
+        <div class="box-col">
+            <div class="box-row box-center1">
+                <span class="text-center justify-center" style="height: 100px; width:100px;">click the paper and pen</span>
+                <button class="TEO-Selector-Event">📝</button>
+                <span class="text-center justify-center" style="height: 100px; width:100px;">Update Values to load different editors</span>
+            </div>
+            <br>
+            <div class="box-row box-center1">
 
-			</div>
-			<br>
-			<br>
-			<div class="box-col w100">
-				
-				<div class="TEO-UI-Anchor">
-					<div class="TEO-Editable-Container" data-TEO-BitCode="1023" id='001'>						
-					</div>	
-				</div>
-				
-				<br>
-				
-				<div class="TEO-UI-Anchor">				
-					<div class="TEO-Editable-Container" data-TEO-BitCode="362" id='002'>
-					</div>	
-				</div>
-				
-				<br>
-				
-				<div class="TEO-UI-Anchor">
-					<div class="TEO-Editable-Container" data-TEO-BitCode="724" id='003'></div>	
-				</div>
+                <div class="box-col">
+                    <input type="text" id="input1" value="2047" />
+                    <input type="submit" value="Top Editor" onclick="update_one(this)">
+                </div>
+                <div class="box-col">
+                    <input type="text" id="input2" value="362" />
+                    <input type="submit" value="Middle Editor" onclick="update_two(this)">
+                </div>
+                <div class="box-col">
+                    <input type="text" id="input3" value="724">
+                    <input type="submit" value="Bottom Editor" onclick="update_three(this)">
+                </div>
 
-			</div>
-			
+            </div>
+
+        </div>
+        <br>
+        <br>
+        <div class="box-col w100">
+
+            <div class="TEO-UI-Anchor">
+                <div class="TEO-Editable-Container" data-TEO-BitCode="2047" id='001'>
+
+                    <p class="" style="text-align: center;">
+                        <span class="" style="font-size: 30px; color: rgb(255, 0, 0);">D</span><span class="" style="font-size: 30px; color: rgb(0, 255, 0);">o</span><span class="" style="font-size: 30px; color: rgb(0, 0, 255);">c</span><span class="" style="font-size: 30px; color: rgb(255, 0, 255);">y</span><span class="" style="font-size: 30px; color: rgb(0, 255, 255);">D</span><span class="" style="font-size: 30px; color: rgb(255, 165, 0);">r</span><span class="" style="font-size: 30px; color: rgb(128, 0, 128);">i</span><span class="" style="font-size: 30px; color: rgb(0, 128, 0);">p</span><span style="font-size: 30px;"> </span><span class="" style="font-size: 30px; color: rgb(0, 0, 128);">-</span><span style="font-size: 30px;"> </span><span class="" style="font-size: 30px; color: rgb(255, 0, 0);">T</span><span class="" style="font-size: 30px; color: rgb(0, 255, 0);">e</span><span class="" style="font-size: 30px; color: rgb(0, 0, 255);">x</span><span class="" style="font-size: 30px; color: rgb(255, 0, 255);">t</span><span style="font-size: 30px;"> </span><span class="" style="font-size: 30px; color: rgb(0, 255, 255);">E</span><span class="" style="font-size: 30px; color: rgb(255, 165, 0);">d</span><span class="" style="font-size: 30px; color: rgb(128, 0, 128);">i</span><span class="" style="font-size: 30px; color: rgb(0, 128, 0);">t</span><span class="" style="font-size: 30px; color: rgb(0, 0, 128);">o</span><span class="" style="font-size: 30px; color: rgb(255, 0, 0);">r</span><span style="font-size: 30px;"> </span><span class="" style="font-size: 30px; color: rgb(0, 255, 0);">O</span><span class="" style="font-size: 30px; color: rgb(0, 0, 255);">b</span><span style="color: rgb(255, 0, 255); font-size: 30px;">j</span><span class="" style="font-size: 30px; color: rgb(255, 165, 0);">e</span><span class="" style="font-size: 30px; color: rgb(128, 0, 128);">c</span><span class="" style="font-size: 30px; color: rgb(0, 128, 0);">t</span>
+                        <span><br></span>
+                        <span class="">Rich Text Editor made with JavaScript</span>
+                    </p>
+                    <p class="" style="text-indent: 25px;"><span class="">Web Text Editing solution Created by Tyler A Reber</span><span class=""><br></span></p>
+                    <ul class="">
+                        <li><span class="">Free and Open Source</span></li>
+                        <li><span class="">Fully Customizable</span></li>
+                        <li><span class="">Functionality enabled with Bitwise operations</span></li>
+                        <li><span class="">Basic Editing Experience</span></li>
+                        <li><span class="">Made with in-house traversal methods, without deprecated functions like the execCommand</span></li>
+                    </ul>
+
+                </div>
+
+                <br>
+
+                <div class="TEO-UI-Anchor">
+                    <div class="TEO-Editable-Container" data-TEO-BitCode="362" id='002'>
+                        <h3 class="" style="text-align: center;"><span class="">Bit Values to Enable different interfaces</span></h3>
+                        <p class="">
+                            <span class="">Value 0: Loads - No UI Enabledd</span>
+                            <span><br></span>
+                            <span class="">Value 1: DB Storage / Use Whitespace Formatting (Not Implemented)</span><span><br></span>
+                            <span class="">Value 2: Loads Bold, Italic, Underline</span>
+                            <span><br></span>
+                            <span class="">Value 4: Loads Strikethrough, Subscript and Superscripts</span>
+                            <span><br></span><span class="">Value 8: Create Hyperlinks</span><span><br></span>
+                            <span class="">Value 16: Studio Briefcase Loads Color Selector</span>
+                            <span><br></span>
+                            <span class="">Value 32: Loads Background Color Selector</span>
+                            <span><br></span>
+                            <span class="">Value 64: Loads Font Size Selector</span>
+                            <span><br></span>
+                            <span class="">Value 128: Loads Font Face Selector</span>
+                            <span><br></span>
+                            <span class="">Value 256: Loads Loads Header Block Selector</span>
+                            <span><br></span>
+                            <span class="">Value 512: Loads Indents and Justifies</span>
+                            <span><br></span>
+                            <span class="">Value 1024: Loads List Buttons</span>
+                            <span class=""><br></span>
+                            <span class="">Value 2047: Loads Everything</span><span class=""><br></span>
+                            <span class="">Value 2048: No UI Enabled</span><span class=""><br></span>
+                        </p>
+                        <p class=""><span class="">Other Bits Reserved for additional Features.</span></p>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="TEO-UI-Anchor">
+                    <div class="TEO-Editable-Container" data-TEO-BitCode="724" id='003'>
+
+                        <h3 class="" style="text-align: center;">
+                            <span class="" style="color: rgb(255, 0, 255);">Testing Editor on your Environment</span>
+                        </h3><p class=""><span class="">Version 0.6 divided the text editor up into multiple JavaScript files. The goal was to separate the UI creation methods into a separate file which will allow people to easily customize the UI without needing to touch the Editor class.</span></p>
+                        <p class=""><span class="">Having multiple JavaScript export to one another means that the editor can only be tested on a running server or you will get a CORS policy error.</span></p>
+                        <h3 class="" style="text-align: center;"><span class="">What is the CORS Error?</span><span class=""><br></span></h3>
+                        <p class=""><span class="">I understand the CORS policy as a layer of security that was created to prevent other people's JavaScript files from running code on people's personal computer all willynilly.</span></p><h4 class="" style="text-align: center;"><span class="">Solution</span></h4><p class=""><span>Solution is launch a server testing environment. I'm using this </span><a href="https://www.apachefriends.org/"><span class="">apache</span></a><span class="">&nbsp;software to run a server for my testing environment.&nbsp;</span></p><p class="">
+                            <a href="https://www.apachefriends.org/"><span class="">https://www.apachefriends.org/</span></a>
+                            <span><br></span><span class="">
+                                Video how to set it up.
+                            </span><span><br></span><span>
+                            </span><a href="https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t"><span class="">https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t</span></a><span class="">&nbsp;by&nbsp;</span><a href="https://www.youtube.com/@TanUv90"><span class="">TanUv90</span></a>
+                            <span class=""><br></span>
+                        </p>
+                        <p class=""><span class=""><br></span></p>
+                        <p>Known Bugs</p>
+                        <ol class="">
+                            <li><span class="">Selecting Really Fast Will Delete stuff.</span></li>
+                            <li><span class="">Initial Implementation of many features is rough, I will be going back over time to polish them. I am emphasizing priority over decoupling current code from the UI and the Global Variables. The goal of which will the editor to be updated and polished without requiring users to recreate their customized assets.</span></li>
+                            <li><span>There's still issues with the editor mishandling formatting and whitespaces inherited from an html file</span></li>
+                        </ol>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
 
-		</body>	
-		<script type='module' src='TEO-UI.js'></script>
-		<!-- <script type='module' src='DocyDrip-TEO.js'></script> -->
-		<script src='DemoScript.js'></script>	
-	<main>
+
+    </main>
+    <script type='module' src='TEO-UI.js'></script>
+    <!-- <script type='module' src='DocyDrip-TEO.js'></script> -->
+    <script src='DemoScript.js'></script>
+</body>
 </html>
 
-			<!-- <div class="w100" id="EditorFooter"> -->
-			<!-- <span>Edited by: Tyler Reber</span> -->
-			<!-- </div> -->
+<!-- <div class="w100" id="EditorFooter"> -->
+<!-- <span>Edited by: Tyler Reber</span> -->
+<!-- </div> -->

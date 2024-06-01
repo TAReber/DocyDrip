@@ -1,6 +1,6 @@
 DocyDrip - Text Editor Obejct
 By: Tyler Reber
-Version 0.5 - Alpha
+Version 0.6 - Alpha
 
 CORS POLICY Error AND SOLUTION - FOR BEGINNERS
 Refactor is Separating UI Files and Global Constants into a new file. This means that I will be importing and exporting variables between these 2 files. When I change a script to a type of module, it will will cause the CORS policy error.

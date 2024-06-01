@@ -1568,11 +1568,14 @@ export class TextEditorObject {
     //Takes in a the Range's startContainer and traverses to the Tree Node
     //If the input is not a text node, it is the parent container of a br tag
     FindTargetTree(Block, TextNode) {
-
+		let type = document.getSelection().type;
         if (this.Block_is_Standard_Structure(Block)) {
             if (TextNode === Block) {
-                TextNode = this.NormalizeBlock(TextNode);
-                document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+				if(type === 'Caret'){
+				    TextNode = this.NormalizeBlock(TextNode);
+					document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+				}
+
             }
             else {
                 while (TextNode.parentNode !== Block && TextNode.tagName !== Const.Tree) {
@@ -1582,8 +1585,10 @@ export class TextEditorObject {
         }
         else if (this.Block_is_List_Structure(Block)) {
             if (TextNode.parentNode === Block) {
-                TextNode = this.NormalizeBlock(TextNode);
-                document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+                if(type === 'Caret'){
+					TextNode = this.NormalizeBlock(TextNode);
+					document.getSelection().getRangeAt(0).setStart(TextNode, 0);
+				}
             }
             else {
                 while (TextNode.parentNode.tagName !== ListStructures.ListItem && TextNode.tagName !== Const.Tree) {

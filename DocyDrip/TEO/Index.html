@@ -99,19 +99,31 @@
                             <span class="" style="color: rgb(255, 0, 255);">Testing Editor on your Environment</span>
                         </h3><p class=""><span class="">Version 0.6 divided the text editor up into multiple JavaScript files. The goal was to separate the UI creation methods into a separate file which will allow people to easily customize the UI without needing to touch the Editor class.</span></p>
                         <p class=""><span class="">Having multiple JavaScript export to one another means that the editor can only be tested on a running server or you will get a CORS policy error.</span></p>
-                        <h3 class="" style="text-align: center;"><span class="">What is the CORS Error?</span><span class=""><br></span></h3>
-                        <p class=""><span class="">I understand the CORS policy as a layer of security that was created to prevent other people's JavaScript files from running code on people's personal computer all willynilly.</span></p><h4 class="" style="text-align: center;"><span class="">Solution</span></h4><p class=""><span>Solution is launch a server testing environment. I'm using this </span><a href="https://www.apachefriends.org/"><span class="">apache</span></a><span class="">&nbsp;software to run a server for my testing environment.&nbsp;</span></p><p class="">
+                        <h3 class="" style="text-align: center;">
+						<span class="">What is the CORS Error?</span>
+						<span class=""><br></span></h3>
+                        <p class="">
+							<span class="">I understand the CORS policy as a layer of security that was created to prevent other people's JavaScript files from running code on people's personal computer all willynilly.</span>
+						</p>
+						<h4 class="" style="text-align: center;">
+						<span class="">Solution</span></h4><p class="">
+						<span>Solution is launch a server testing environment. I'm using this </span>
+						<a href="https://www.apachefriends.org/"><span class="">apache</span></a>
+						<span class="">&nbsp;software to run a server for my testing environment.&nbsp;</span></p>
+						<p class="">
                             <a href="https://www.apachefriends.org/"><span class="">https://www.apachefriends.org/</span></a>
-                            <span><br></span><span class="">
-                                Video how to set it up.
-                            </span><span><br></span><span>
-                            </span><a href="https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t"><span class="">https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t</span></a><span class="">&nbsp;by&nbsp;</span><a href="https://www.youtube.com/@TanUv90"><span class="">TanUv90</span></a>
+                            <span><br></span>
+							<span class="">Video how to set it up.</span>
+							<span><br></span>
+							<a href="https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t"><span class="">https://www.youtube.com/watch?v=k9em7Ey00xQ&amp;t</span></a>
+							<span class="">&nbsp;by&nbsp;</span>
+							<a href="https://www.youtube.com/@TanUv90"><span class="">TanUv90</span></a>
                             <span class=""><br></span>
                         </p>
                         <p class=""><span class=""><br></span></p>
-                        <p>Known Bugs</p>
+                        <p><span>Known Bugs</span></p>
                         <ol class="">
-                            <li><span class="">Selecting Really Fast Will Delete stuff.</span></li>
+                            <li><span class="">Selecting Really Fast Will Delete stuff.(Issues was discovered, solution in testing)</span></li>
                             <li><span class="">Initial Implementation of many features is rough, I will be going back over time to polish them. I am emphasizing priority over decoupling current code from the UI and the Global Variables. The goal of which will the editor to be updated and polished without requiring users to recreate their customized assets.</span></li>
                             <li><span>There's still issues with the editor mishandling formatting and whitespaces inherited from an html file</span></li>
                         </ol>
